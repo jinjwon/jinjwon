@@ -16,7 +16,7 @@
 <td width="50%" valign="top">
 <img src="assets/walla.png" width="100%" alt="WALLA · 설문 제작 — Figma 포트폴리오 표지" />
 <h3>WALLA · 설문 제작</h3>
-<p><strong>Product Designer</strong><<br>문제·가설 정의 · IA·User Flow · UT 설계</p>
+<p><strong>Product Designer</strong><br>문제·가설 정의 · IA·User Flow · UT 설계</p>
 </td>
 </tr>
 <tr>
