@@ -6,12 +6,32 @@
 
 ## 프로젝트
 
-| 프로젝트 | 역할 | 핵심 기여 |
-| :--- | :--- | :--- |
-| **VENDIT** · 숙박 요금 관리 | 팀장 · Product Designer | 운영자 리서치, 시장 비교·가격 결정 UX, Framer 프로토타입 |
-| **WALLA** · 설문 제작 | PM · 팀장 | 문제·가설 정의, IA·User Flow 작성, 조건 설정 UT 설계 |
-| **GOGO** · 체육대회 서비스 | 단독 UI/UX 디자이너 | 핵심 화면·인터랙션 설계, 개발 협업, Design QA·출시 대응 |
-| **PAWCE** · 반려견 훈련 | 브랜딩 · 디자인 시스템 | 브랜드·공통 컴포넌트 구축, 팀 화면의 시각적 일관성 정리 |
+<table>
+<tr>
+<td width="50%" valign="top">
+<img src="assets/vendit.png" width="100%" alt="VENDIT · 숙박 요금 관리 — Figma 포트폴리오 표지" />
+<h3>VENDIT · 숙박 요금 관리</h3>
+<p><strong>팀장 · Product Designer</strong><br>운영자 리서치 · 요금 결정 UX · Framer 프로토타입</p>
+</td>
+<td width="50%" valign="top">
+<img src="assets/walla.png" width="100%" alt="WALLA · 설문 제작 — Figma 포트폴리오 표지" />
+<h3>WALLA · 설문 제작</h3>
+<p><strong>PM · 팀장</strong><br>문제·가설 정의 · IA·User Flow · UT 설계</p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="assets/gogo.png" width="100%" alt="GOGO · 체육대회 서비스 — Figma 포트폴리오 표지" />
+<h3>GOGO · 체육대회 서비스</h3>
+<p><strong>단독 UI/UX 디자이너</strong><br>화면·인터랙션 설계 · 개발 협업 · QA·출시 대응</p>
+</td>
+<td width="50%" valign="top">
+<img src="assets/pawce.png" width="100%" alt="PAWCE · 반려견 훈련 — Figma 포트폴리오 표지" />
+<h3>PAWCE · 반려견 훈련</h3>
+<p><strong>브랜딩 · 디자인 시스템</strong><br>브랜드·공통 컴포넌트 · 팀 화면의 일관성 정리</p>
+</td>
+</tr>
+</table>
 
 ## 도구
 
