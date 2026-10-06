@@ -35,4 +35,4 @@
 
 ## 도구
 
-Figma · Framer · Illustrator · Photoshop · Blender · MAZE
+Figma · Framer · Illustrator · Photoshop · Blender
