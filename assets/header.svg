@@ -1,15 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
-  <title id="title">JINWON KIM — Clarity through design.</title>
-  <desc id="desc">Ivory editorial banner with black typography and a blue geometric decision symbol.</desc>
-  <rect width="1280" height="420" rx="20" fill="#F5F3EC"/>
-  <g font-family="Arial, Helvetica, sans-serif" fill="#18191B">
-    <text x="64" y="64" font-size="15" letter-spacing="3">RESEARCH / DESIGN / VALIDATE</text>
-    <circle cx="1199" cy="58" r="7" fill="#2F52FE"/>
-    <path d="M64 93H1216" stroke="#18191B" stroke-opacity=".2"/>
-    <text x="58" y="212" font-size="100" font-weight="700" letter-spacing="-6">JINWON KIM</text>
-    <text x="64" y="275" font-size="36" letter-spacing="-1">Clarity through design.</text>
-    <text x="64" y="360" font-size="15" letter-spacing="2">PRODUCT DESIGNER / JINJWON</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 240" role="img" aria-label="Jinwon Kim — Product Designer who builds">
+  <style>
+    .ink { fill: #1f2328 }
+    .dim { fill: #656d76 }
+    .plate { fill: #ffffff; stroke: #1f2328; stroke-width: 1.5 }
+    .line { stroke: #1f2328; stroke-width: 1.5; fill: none }
+    .soft { fill: #1f2328; opacity: .14 }
+    .acc { fill: #5b6cff }
+    .accline { stroke: #5b6cff; stroke-width: 3; stroke-linecap: round }
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: #e6edf3 }
+      .dim { fill: #8b949e }
+      .plate { fill: #0d1117; stroke: #e6edf3 }
+      .line { stroke: #e6edf3 }
+      .soft { fill: #e6edf3 }
+      .acc { fill: #8b96ff }
+      .accline { stroke: #8b96ff }
+    }
+    text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace }
+  </style>
+
+  <text x="24" y="104" class="ink" font-size="46" font-weight="700" letter-spacing="2">JINWON KIM</text>
+  <text x="26" y="140" class="dim" font-size="17">Product Designer · design → prototype → ship</text>
+  <rect x="26" y="164" width="12" height="20" class="acc">
+    <animate attributeName="opacity" values="1;1;0;0" dur="1.2s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- isometric stack: wireframe → UI → code -->
+  <g>
+    <g transform="translate(680 165) matrix(.866 .5 -.866 .5 0 0)">
+      <rect x="-60" y="-60" width="120" height="120" class="plate" stroke-dasharray="5 5"/>
+      <path class="line" stroke-dasharray="3 5" d="M-20-60V60M20-60V60M-60-20H60M-60 20H60"/>
+    </g>
   </g>
-  <rect x="985" y="147" width="200" height="200" rx="44" fill="#2F52FE"/>
-  <path d="M1030 248L1068 286L1142 208" fill="none" stroke="#F5F3EC" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -10;0 0" dur="5s" repeatCount="indefinite" calcMode="spline" keySplines=".4 0 .6 1;.4 0 .6 1"/>
+    <g transform="translate(680 120) matrix(.866 .5 -.866 .5 0 0)">
+      <rect x="-60" y="-60" width="120" height="120" class="plate"/>
+      <rect x="-48" y="-48" width="96" height="18" class="soft"/>
+      <rect x="-48" y="-20" width="44" height="68" class="soft"/>
+      <rect x="4" y="-20" width="44" height="30" class="soft"/>
+      <rect x="4" y="18" width="44" height="30" class="acc"/>
+    </g>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -20;0 0" dur="5s" repeatCount="indefinite" calcMode="spline" keySplines=".4 0 .6 1;.4 0 .6 1"/>
+    <g transform="translate(680 75) matrix(.866 .5 -.866 .5 0 0)">
+      <rect x="-60" y="-60" width="120" height="120" class="plate"/>
+      <path class="accline" d="M-44-38H-8"/>
+      <path class="line" stroke-width="3" stroke-linecap="round" d="M-32-18H26M-32 2H8M-32 22H38M-44 42H-20"/>
+    </g>
+  </g>
 </svg>
