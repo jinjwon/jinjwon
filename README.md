@@ -1,4 +1,4 @@
-<img src="assets/header.svg" width="100%" alt="Jinwon Kim — Product Designer" />
+<img src="assets/owl.svg" width="100%" alt="Jinwon Kim — Product Designer" />
 
 ### 김진원 · Jinwon
 
