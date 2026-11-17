@@ -1,4 +1,6 @@
-<img src="assets/owl-laptop.svg" width="100%" alt="Jinwon Kim — Product Designer" />
+<img src="assets/rowlet.webp" align="right" width="32%" alt="노트북으로 작업하는 3D 부엉이" />
+<img src="assets/title.svg" width="62%" alt="Jinwon Kim — Product Designer" />
+<br clear="right" />
 
 ### 김진원 · Jinwon
 
