@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 100" role="img" aria-label="VENDIT — 숙박 요금 관리 · 운영자 리서치 · 요금 결정 UX · Framer 프로토타입 (TEAM LEAD)">
+<g font-family="Arial Black,Helvetica Neue,Impact,Apple SD Gothic Neo,Malgun Gothic,sans-serif" font-weight="900" font-style="italic" transform="rotate(-1 420 50)">
+<polygon points="14,2 834,8 838,12 826,62 8,56 6,50" fill="#ff1a2e"/>
+<polygon points="18,6 830,12 822,58 10,52" fill="#ffffff"/>
+<rect x="36" y="13" width="26" height="36" rx="2" fill="none" stroke="#111111" stroke-width="2" transform="rotate(-9 49 31)"/>
+<text x="49" y="39" text-anchor="middle" font-size="18" fill="#111111" font-style="normal">I</text>
+<text x="80" y="45" font-size="31" fill="#111111">VENDIT</text>
+<text x="808" y="45" text-anchor="end" font-size="26" fill="#111111">TEAM LEAD</text>
+<text x="632" y="45" text-anchor="end" font-size="11" fill="#111111">ROLE</text>
+<polygon points="72,57 812,62 806,92 66,87" fill="#111111"/>
+<text x="440" y="82" text-anchor="middle" font-size="17" fill="#ffffff" font-style="normal" font-weight="700">숙박 요금 관리 · 운영자 리서치 · 요금 결정 UX · Framer 프로토타입</text>
+</g>
+</svg>

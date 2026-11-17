@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 100" role="img" aria-label="figmon — 작업한 시간만큼 자라는 데스크톱 펫 (HTML)">
+<g font-family="Arial Black,Helvetica Neue,Impact,Apple SD Gothic Neo,Malgun Gothic,sans-serif" font-weight="900" font-style="italic" transform="rotate(-1 420 50)">
+
+<polygon points="18,6 830,12 822,58 10,52" fill="#141c5c"/>
+<rect x="36" y="13" width="26" height="36" rx="2" fill="none" stroke="#c4f6ff" stroke-width="2" transform="rotate(-9 49 31)"/>
+<text x="49" y="39" text-anchor="middle" font-size="18" fill="#c4f6ff" font-style="normal">II</text>
+<text x="80" y="45" font-size="31" fill="#c4f6ff">figmon</text>
+<text x="808" y="45" text-anchor="end" font-size="30" fill="#c4f6ff">HTML</text>
+<text x="694" y="45" text-anchor="end" font-size="11" fill="#c4f6ff">STACK</text>
+<polygon points="72,57 812,62 806,92 66,87" fill="#6fe0ff"/>
+<text x="440" y="82" text-anchor="middle" font-size="17" fill="#0b1440" font-style="normal" font-weight="700">작업한 시간만큼 자라는 데스크톱 펫</text>
+</g>
+</svg>
