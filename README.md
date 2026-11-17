@@ -1,4 +1,4 @@
-<img src="assets/rowlet.webp" align="right" width="32%" alt="노트북으로 작업하는 3D 부엉이" />
+<img src="assets/shapes.webp" align="right" width="32%" alt="회전하는 3D 도형 — 클레이 큐브, 금속 링, 래커 구, 무광 이십면체" />
 <img src="assets/title.svg" width="62%" alt="Jinwon Kim — Product Designer" />
 <br clear="right" />
 

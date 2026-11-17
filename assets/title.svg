@@ -6,5 +6,5 @@ text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 </style>
 <text x="4" y="88" class="ink" font-size="46" font-weight="700" letter-spacing="2">JINWON KIM</text>
 <text x="6" y="124" class="dim" font-size="17">Product Designer · design → prototype → ship</text>
-<rect x="6" y="146" width="12" height="20" fill="#3fa98a"><animate attributeName="opacity" values="1;1;0;0" dur="1.2s" repeatCount="indefinite"/></rect>
+<rect x="6" y="146" width="12" height="20" fill="#4f63ff"><animate attributeName="opacity" values="1;1;0;0" dur="1.2s" repeatCount="indefinite"/></rect>
 </svg>
