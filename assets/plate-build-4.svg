@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 100" role="img" aria-label="silent-dawn — 2인 협동 픽셀 판타지 RPG 프롤로그 (JavaScript)">
 <g font-family="Arial Black,Helvetica Neue,Impact,Apple SD Gothic Neo,Malgun Gothic,sans-serif" font-weight="900" font-style="italic" transform="rotate(-1 420 50)">
 
-<polygon points="18,6 830,12 822,58 10,52" fill="#141c5c"/>
-<rect x="36" y="13" width="26" height="36" rx="2" fill="none" stroke="#c4f6ff" stroke-width="2" transform="rotate(-9 49 31)"/>
-<text x="49" y="39" text-anchor="middle" font-size="18" fill="#c4f6ff" font-style="normal">IV</text>
-<text x="80" y="45" font-size="31" fill="#c4f6ff">silent-dawn</text>
-<text x="808" y="45" text-anchor="end" font-size="26" fill="#c4f6ff">JavaScript</text>
-<text x="614" y="45" text-anchor="end" font-size="11" fill="#c4f6ff">STACK</text>
-<polygon points="72,57 812,62 806,92 66,87" fill="#6fe0ff"/>
+<polygon points="18,6 830,12 822,58 10,52" fill="#14206e"/>
+<rect x="34" y="11" width="28" height="40" rx="2" fill="#14206e" stroke="#8ff0ff" stroke-width="2.4" transform="rotate(-9 48 31)"/>
+<text x="48" y="40" text-anchor="middle" font-size="20" fill="#8ff0ff" font-style="normal" font-family="Georgia,serif">III</text>
+<text x="80" y="46" font-size="32" fill="#8ff0ff">silent-dawn</text>
+<text x="808" y="46" text-anchor="end" font-size="24" fill="#8ff0ff">JavaScript</text>
+<text x="623" y="46" text-anchor="end" font-size="12" fill="#8ff0ff">STACK</text>
+<polygon points="72,57 812,62 806,92 66,87" fill="#8ff0ff"/>
 <text x="440" y="82" text-anchor="middle" font-size="17" fill="#0b1440" font-style="normal" font-weight="700">2인 협동 픽셀 판타지 RPG 프롤로그</text>
 </g>
 </svg>

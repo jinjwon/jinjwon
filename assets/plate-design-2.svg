@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 100" role="img" aria-label="WALLA — 설문 제작 · 문제·가설 정의 · IA·User Flow · UT 설계 (PRODUCT)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 100" role="img" aria-label="광탈페 — 광탈페 홍보, 신청, 투표를 통합 관리하는 행사 관리 플랫폼 (25.04–25.09)">
 <g font-family="Arial Black,Helvetica Neue,Impact,Apple SD Gothic Neo,Malgun Gothic,sans-serif" font-weight="900" font-style="italic" transform="rotate(-1 420 50)">
 
-<polygon points="18,6 830,12 822,58 10,52" fill="#141c5c"/>
-<rect x="36" y="13" width="26" height="36" rx="2" fill="none" stroke="#c4f6ff" stroke-width="2" transform="rotate(-9 49 31)"/>
-<text x="49" y="39" text-anchor="middle" font-size="18" fill="#c4f6ff" font-style="normal">II</text>
-<text x="80" y="45" font-size="31" fill="#c4f6ff">WALLA</text>
-<text x="808" y="45" text-anchor="end" font-size="30" fill="#c4f6ff">PRODUCT</text>
-<text x="619" y="45" text-anchor="end" font-size="11" fill="#c4f6ff">ROLE</text>
-<polygon points="72,57 812,62 806,92 66,87" fill="#6fe0ff"/>
-<text x="440" y="82" text-anchor="middle" font-size="17" fill="#0b1440" font-style="normal" font-weight="700">설문 제작 · 문제·가설 정의 · IA·User Flow · UT 설계</text>
+<polygon points="18,6 830,12 822,58 10,52" fill="#14206e"/>
+<rect x="34" y="11" width="28" height="40" rx="2" fill="#14206e" stroke="#8ff0ff" stroke-width="2.4" transform="rotate(-9 48 31)"/>
+<text x="48" y="40" text-anchor="middle" font-size="20" fill="#8ff0ff" font-style="normal" font-family="Georgia,serif">I</text>
+<text x="80" y="46" font-size="32" fill="#8ff0ff">광탈페</text>
+<text x="808" y="46" text-anchor="end" font-size="24" fill="#8ff0ff">25.04–25.09</text>
+<text x="606" y="46" text-anchor="end" font-size="12" fill="#8ff0ff">TERM</text>
+<polygon points="72,57 812,62 806,92 66,87" fill="#8ff0ff"/>
+<text x="440" y="82" text-anchor="middle" font-size="17" fill="#0b1440" font-style="normal" font-weight="700">광탈페 홍보, 신청, 투표를 통합 관리하는 행사 관리 플랫폼</text>
 </g>
 </svg>
