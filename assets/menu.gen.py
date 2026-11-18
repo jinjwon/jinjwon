@@ -1,7 +1,7 @@
 # Generates the profile graphics in a pause-menu style: a header (menu.svg) and one list plate per project.
 #   python3 assets/menu.gen.py     (run from the repo root; rewrites assets/menu.svg and assets/plate-*.svg)
 # GitHub READMEs run no scripts or CSS, so everything is plain SVG with SMIL animation.
-import os
+import base64, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONT = 'font-family="Arial Black,Helvetica Neue,Impact,Apple SD Gothic Neo,Malgun Gothic,sans-serif" font-weight="900" font-style="italic"'
@@ -42,24 +42,31 @@ def header():
         f'<animateTransform attributeName="transform" type="translate" values="0 0;{dx} 4;0 0" dur="{d}s" repeatCount="indefinite"/></path>'
         for x, y, rx, ry, o, dx, d in [(420, 30, 60, 14, .35, 26, 7), (560, 60, 40, 10, .3, -18, 9), (680, 26, 80, 16, .35, 22, 8),
                                       (780, 70, 34, 8, .3, -14, 6), (470, 96, 30, 7, .25, 16, 10), (620, 120, 44, 9, .2, -20, 11)])
+    windows = "".join(  # faint window frames behind the water, like the classroom backdrop
+        f'<rect x="{x}" y="0" width="3" height="360" fill="#0716b0" opacity=".18"/>' for x in range(440, 840, 64))
+    # hero.png is the profile avatar, posterized to the four menu blues
+    hero = base64.b64encode(open(os.path.join(HERE, "hero.png"), "rb").read()).decode()
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 360" role="img" aria-label="Jinwon Kim — Product Designer. Project, build, skill, contact.">
 <defs>
 <linearGradient id="bg" x1="0" y1="0" x2=".8" y2="1"><stop offset="0" stop-color="#55d3ff"/><stop offset=".4" stop-color="#1673ef"/><stop offset="1" stop-color="#0716b0"/></linearGradient>
 <clipPath id="c"><rect width="840" height="360" rx="10"/></clipPath>
+<clipPath id="hero"><polygon points="128,84 344,74 196,360 92,360"/></clipPath>
 </defs>
 <g clip-path="url(#c)" {FONT}>
 <rect width="840" height="360" fill="url(#bg)"/>
 {caustics}
+{windows}
 <text transform="translate(640 420) rotate(-62)" font-size="150" fill="#ffffff" opacity=".22">MENU</text>
-<polygon points="0,0 360,0 176,360 0,360" fill="#ffffff"/>
-<polygon points="360,0 400,0 216,360 176,360" fill="#0716b0"/>
-<polygon points="400,0 412,0 228,360 216,360" fill="#ffffff" opacity=".55"/>
-<text transform="translate(86 372) rotate(-90)" font-size="118" fill="#c9cfd8">PROFILE</text>
-<text transform="translate(76 366) rotate(-90)" font-size="118" fill="#0b0b0b">PROFILE</text>
-<g transform="rotate(-2 210 60)">
-<rect x="104" y="28" width="230" height="64" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.5"/>
-<text x="116" y="62" font-size="26" fill="#0b0b0b">JINWON KIM</text>
-<text x="117" y="81" font-size="11" fill="#0b0b0b" font-weight="700">product designer · vibe coder</text>
+<polygon points="0,0 380,0 196,360 0,360" fill="#ffffff"/>
+<g clip-path="url(#hero)"><image href="data:image/png;base64,{hero}" x="40" y="-20" width="400" height="400" transform="rotate(-14 240 180)"/></g>
+<polygon points="380,0 404,0 220,360 196,360" fill="#0716b0"/>
+<polygon points="404,0 414,0 230,360 220,360" fill="#ffffff" opacity=".6"/>
+<text transform="translate(66 372) rotate(-90)" font-size="104" fill="#c9cfd8">PROFILE</text>
+<text transform="translate(58 366) rotate(-90)" font-size="104" fill="#0b0b0b">PROFILE</text>
+<g transform="rotate(-2 200 50)">
+<rect x="92" y="18" width="200" height="50" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.5"/>
+<text x="102" y="44" font-size="22" fill="#0b0b0b">JINWON KIM</text>
+<text x="103" y="60" font-size="9" fill="#0b0b0b" font-weight="700">product designer · vibe coder</text>
 </g>
 {shards}
 <g transform="translate(470 96) rotate(-7) skewX(-6)">
