@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 100" role="img" aria-label="undertow — Claude Code · Codex 중심의 데스크톱 코드 에디터 (TypeScript)">
 <g font-family="Arial Black,Helvetica Neue,Impact,Apple SD Gothic Neo,Malgun Gothic,sans-serif" font-weight="900" font-style="italic" transform="rotate(-1 420 50)">
-<polygon points="14,2 834,8 838,12 826,62 8,56 6,50" fill="#ff1428"/>
-<polygon points="18,6 830,12 822,58 10,52" fill="#ffffff"/>
-<rect x="34" y="11" width="28" height="40" rx="2" fill="#ffffff" stroke="#0b0b0b" stroke-width="2.4" transform="rotate(-9 48 31)"/>
-<text x="48" y="40" text-anchor="middle" font-size="20" fill="#0b0b0b" font-style="normal" font-family="Georgia,serif">0</text>
-<text x="80" y="46" font-size="32" fill="#0b0b0b">undertow</text>
-<text x="808" y="46" text-anchor="end" font-size="24" fill="#0b0b0b">TypeScript</text>
-<text x="623" y="46" text-anchor="end" font-size="12" fill="#0b0b0b">STACK</text>
-<polygon points="72,57 812,62 806,92 66,87" fill="#0b0b0b"/>
-<text x="440" y="82" text-anchor="middle" font-size="17" fill="#ffffff" font-style="normal" font-weight="700">Claude Code · Codex 중심의 데스크톱 코드 에디터</text>
+
+<polygon points="18,6 830,12 822,58 10,52" fill="#14206e"/>
+<rect x="34" y="11" width="28" height="40" rx="2" fill="#14206e" stroke="#8ff0ff" stroke-width="2.4" transform="rotate(-9 48 31)"/>
+<text x="48" y="40" text-anchor="middle" font-size="20" fill="#8ff0ff" font-style="normal" font-family="Georgia,serif">0</text>
+<text x="80" y="46" font-size="32" fill="#8ff0ff">undertow</text>
+<text x="808" y="46" text-anchor="end" font-size="24" fill="#8ff0ff">TypeScript</text>
+<text x="623" y="46" text-anchor="end" font-size="12" fill="#8ff0ff">STACK</text>
+<polygon points="72,57 812,62 806,92 66,87" fill="#8ff0ff"/>
+<text x="440" y="82" text-anchor="middle" font-size="17" fill="#0b1440" font-style="normal" font-weight="700">Claude Code · Codex 중심의 데스크톱 코드 에디터</text>
 </g>
 </svg>

@@ -19,18 +19,16 @@ BUILD = [("undertow", "TypeScript", "Claude Code · Codex 중심의 데스크톱
 
 
 def header():
-    items = [("PROJECT", 56, 0, 0), ("BUILD", 52, 30, 50), ("SKILL", 48, 12, 98), ("CONTACT", 46, 44, 144), ("PORTFOLIO", 44, 6, 188)]
+    items = [("PROJECT", 42, 0, 0), ("BUILD", 42, 26, 46), ("SKILL", 42, 10, 92), ("CONTACT", 42, 38, 138), ("PORTFOLIO", 42, 6, 184)]
     slot, menu = 1.4, []
     total = slot * len(items)
     for i, (word, size, x, y) in enumerate(items):
         w = len(word) * size * .74  # rough width of heavy italic caps; the plate only needs to roughly cover the word
         shown = ";".join("1" if k == i else "0" for k in range(len(items)))
         menu.append(f'<text x="{x}" y="{y}" font-size="{size}" fill="{CYANS[i % 3]}">{word}</text>')
-        menu.append(  # the "selected" look: pink-edged white slash, red word with a black drop
+        menu.append(  # the "selected" look: a quiet white slash behind a red word
             f'<g opacity="{1 if i == 0 else 0}"><animate attributeName="opacity" dur="{total}s" repeatCount="indefinite" calcMode="discrete" values="{shown}"/>'
-            f'<polygon points="{x - 60},{y - size * .5:.0f} {x + w + 90:.0f},{y - size * .95:.0f} {x + w + 40:.0f},{y + size * .3:.0f} {x - 30},{y + size * .18:.0f}" fill="#ff2f86"/>'
-            f'<polygon points="{x - 50},{y - size * .48:.0f} {x + w + 74:.0f},{y - size * .86:.0f} {x + w + 32:.0f},{y + size * .2:.0f} {x - 24},{y + size * .1:.0f}" fill="#ffffff"/>'
-            f'<text x="{x + 4}" y="{y + 3}" font-size="{size}" fill="#0b0b0b">{word}</text>'
+            f'<polygon points="{x - 14},{y - size * .62:.0f} {x + w + 26:.0f},{y - size * .78:.0f} {x + w + 14:.0f},{y + size * .12:.0f} {x - 6},{y + size * .08:.0f}" fill="#ffffff" opacity=".9"/>'
             f'<text x="{x}" y="{y}" font-size="{size}" fill="#ff1428">{word}</text></g>')
     shards = "".join(  # drifting glass shards
         f'<polygon points="0,0 {w},{h * .3:.0f} {w * .3:.0f},{h}" fill="{c}" opacity=".8" transform="translate({x} {y})">'
@@ -72,7 +70,7 @@ def header():
 <g transform="translate(470 96) rotate(-7) skewX(-6)">
 {"".join(menu)}
 </g>
-<text x="820" y="318" text-anchor="end" font-size="16" fill="#ffffff" font-style="normal" font-weight="700">어떤 프로젝트를 확인할까?</text>
+<text x="820" y="318" text-anchor="end" font-size="16" fill="#ffffff" font-style="normal" font-weight="700">무엇을 확인할까?</text>
 <rect x="596" y="325" width="224" height="1.5" fill="#ffffff"/>
 <text x="596" y="337" font-size="9" fill="#ffffff" font-weight="700">Guide</text>
 <text x="820" y="352" text-anchor="end" font-size="13" fill="#ffffff">⊗ SELECT  ◎ BACK</text>
@@ -81,7 +79,7 @@ def header():
 
 
 def plate(i, name, label, tag, desc):
-    first = i == 0  # the top row of each list wears the "selected" colors
+    first = False  # every row reads the same; no row is singled out
     bar, ink, sub, sub_ink = ("#ffffff", "#0b0b0b", "#0b0b0b", "#ffffff") if first else ("#14206e", "#8ff0ff", "#8ff0ff", "#0b1440")
     edge = '<polygon points="14,2 834,8 838,12 826,62 8,56 6,50" fill="#ff1428"/>' if first else ""
     tag_size = 30 if len(tag) < 9 else 24
