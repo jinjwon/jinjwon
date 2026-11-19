@@ -1,0 +1,33 @@
+# Regenerates assets/screen.svg from the live GitHub profile (avatar, name, bio, recent repos).
+# GitHub has no "profile changed" event, so it runs daily, on edits to the generator, and on demand.
+name: profile screen
+on:
+  schedule:
+    - cron: "17 0 * * *"
+  push:
+    branches: [main]
+    paths: [assets/screen.gen.py, .github/workflows/screen.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: screen
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow==11.0.0
+      - run: python assets/screen.gen.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit if changed
+        run: |
+          git diff --quiet assets/screen.svg && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/screen.svg
+          git commit -m "Refresh profile screen"
+          git push
