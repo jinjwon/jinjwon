@@ -100,6 +100,30 @@ def screen(user, repos, hero):
         for x, y, rx, ry, o, dx, d in [(420, 30, 60, 14, .35, 26, 7), (560, 60, 40, 10, .3, -18, 9), (680, 26, 80, 16, .35, 22, 8),
                                       (780, 70, 34, 8, .3, -14, 6), (470, 96, 30, 7, .25, 16, 10), (620, 300, 44, 9, .2, -20, 11)])
     windows = "".join(f'<rect x="{x}" y="0" width="3" height="{H}" fill="#0716b0" opacity=".16"/>' for x in range(440, 840, 64))
+    # Underwater layer, after the art director's notes: shimmer and gradation as if underwater,
+    # bubbles, and glass-like sparkle; light rays sway, bubbles rise, the menu drifts like the mind sinking.
+    rays = "".join(
+        f'<polygon points="{x},0 {x + w},0 {x + w - 90},{H} {x - 150},{H}" fill="#e6fbff" opacity=".07">'
+        f'<animateTransform attributeName="transform" type="skewX" values="0;{k};0" dur="{d}s" repeatCount="indefinite"/></polygon>'
+        for x, w, k, d in [(470, 40, 4, 9), (600, 70, -3, 11), (730, 30, 5, 8)])
+    bubbles = "".join(
+        f'<circle cx="{x}" cy="{H + 10}" r="{r}" fill="none" stroke="#e6fbff" stroke-width="1.2" opacity="0">'
+        f'<animate attributeName="cy" values="{H + 10};-20" dur="{d}s" begin="{b}s" repeatCount="indefinite"/>'
+        f'<animate attributeName="cx" values="{x};{x + 10};{x - 6};{x}" dur="{d}s" begin="{b}s" repeatCount="indefinite"/>'
+        f'<animate attributeName="opacity" values="0;.7;.7;0" keyTimes="0;.1;.8;1" dur="{d}s" begin="{b}s" repeatCount="indefinite"/></circle>'
+        for x, r, d, b in [(470, 3, 7, 0), (520, 5, 9, 2), (610, 2, 6, 1), (700, 4, 8, 3.5), (780, 3, 7.5, 1.5), (430, 2, 6.5, 4), (560, 2.5, 8.5, 5)])
+    sparkles = "".join(  # four-point glints, like light catching glass
+        f'<path d="M{x} {y - 9}L{x + 2} {y - 2}L{x + 9} {y}L{x + 2} {y + 2}L{x} {y + 9}L{x - 2} {y + 2}L{x - 9} {y}L{x - 2} {y - 2}Z" fill="#ffffff" opacity="0">'
+        f'<animate attributeName="opacity" values="0;1;0;0" keyTimes="0;.1;.25;1" dur="{d}s" begin="{b}s" repeatCount="indefinite"/></path>'
+        for x, y, d, b in [(812, 40, 4, 0), (452, 180, 5, 1.6), (300, 92, 4.5, 2.8), (760, 300, 6, .8)])
+    # A huge numeral for the highlighted menu slot, swapped in step with the selection
+    numeral = "".join(
+        f'<text x="420" y="300" font-size="230" fill="#c9cfd8" opacity="0" font-style="normal">{i + 1}'
+        f'<animate attributeName="opacity" dur="{slot * 5}s" repeatCount="indefinite" calcMode="discrete" values="{";".join(".55" if k == i else "0" for k in range(5))}"/></text>'
+        for i in range(5))
+    streaks = "".join(  # thin directional lines that point the eye toward the menu
+        f'<rect x="{x}" y="{y}" width="{w}" height="2" fill="#ffffff" opacity=".5" transform="rotate(-7 {x} {y})"/>'
+        for x, y, w in [(440, 60, 120), (470, 286, 90), (760, 250, 70)])
     name = esc((user.get("name") or user["login"]).upper())
     bio = esc((user.get("bio") or "product designer · vibe coder")[:40])
 
@@ -113,10 +137,13 @@ def screen(user, repos, hero):
 <rect width="{W}" height="{H}" fill="url(#bg)"/>
 {windows}
 {caustics}
+{rays}
+{numeral}
+{streaks}
 <text transform="translate(690 640) rotate(-62)" font-size="170" fill="#ffffff" opacity=".18">LIST</text>
 <text transform="translate(640 330) rotate(-62)" font-size="130" fill="#ffffff" opacity=".18">MENU</text>
 <polygon points="0,0 380,0 230,340 0,340" fill="#ffffff"/>
-<g clip-path="url(#hero)"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -6;0 0" dur="4s" repeatCount="indefinite"/>
+<g clip-path="url(#hero)"><g><animateTransform attributeName="transform" type="translate" values="0 0;4 -9;-2 -3;0 0" dur="7s" calcMode="spline" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" repeatCount="indefinite"/>
 <image href="data:image/png;base64,{hero}" x="40" y="-20" width="380" height="380" transform="rotate(-14 230 170)"/></g></g>
 <polygon points="380,0 404,0 254,340 230,340" fill="#0716b0"/>
 <polygon points="404,0 414,0 264,340 254,340" fill="#ffffff" opacity=".6"/>
@@ -128,6 +155,8 @@ def screen(user, repos, hero):
 <text x="103" y="60" font-size="9" fill="#0b0b0b" {KR}>{bio}</text>
 </g>
 {shards}
+{bubbles}
+{sparkles}
 <g transform="translate(486 92) rotate(-7) skewX(-6)">{"".join(menu)}</g>
 <g transform="rotate(-3 120 370)"><text x="30" y="378" font-size="34" fill="#ffffff">LIST</text><text x="122" y="378" font-size="12" fill="#bff6ff">PROJECT</text></g>
 <g transform="rotate(-3 640 370)"><text x="552" y="378" font-size="22" fill="#ffffff">BUILD</text><text x="640" y="378" font-size="11" fill="#bff6ff">recently pushed</text></g>
@@ -141,6 +170,8 @@ def screen(user, repos, hero):
 <animateTransform attributeName="transform" type="translate" values="0 0;1500 0;1500 0" keyTimes="0;.06;1" dur="9s" begin="1.2s" repeatCount="indefinite"/></polygon>
 <polygon points="-330,0 -300,0 -480,{H} -510,{H}" fill="#ffffff">
 <animateTransform attributeName="transform" type="translate" values="0 0;1500 0;1500 0" keyTimes="0;.06;1" dur="9s" begin="1.2s" repeatCount="indefinite"/></polygon>
+<polygon points="0,0 {W + 300},0 {W},{H} -300,{H}" fill="#ffffff">
+<animateTransform attributeName="transform" type="translate" values="0 0;{W + 400} 0" dur=".55s" fill="freeze" calcMode="spline" keySplines=".7 0 .3 1"/></polygon>
 </g>
 </svg>'''
 
