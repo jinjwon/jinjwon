@@ -41,10 +41,32 @@ def poster(avatar_bytes):
     return base64.b64encode(buf.getvalue()).decode()
 
 
+OPEN = 1.25  # seconds of the white-out + splash before the menu arrives
+
+
 def slide_in(delay, dx=-700):
-    """Row flies in from the side once when the image loads, then holds."""
-    return (f'<animateTransform attributeName="transform" type="translate" values="{dx} 0;12 0;0 0" keyTimes="0;.8;1" '
-            f'dur=".45s" begin="{delay:.2f}s" fill="freeze" calcMode="spline" keySplines=".2 .8 .3 1;.4 0 .6 1"/>')
+    """Row waits off-screen through the opening splash, then flies in once and holds."""
+    dur = OPEN + delay + .45
+    a, b = (OPEN + delay) / dur, (OPEN + delay + .36) / dur
+    return (f'<animateTransform attributeName="transform" type="translate" values="{dx} 0;{dx} 0;12 0;0 0" keyTimes="0;{a:.3f};{b:.3f};1" '
+            f'dur="{dur:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.2 .8 .3 1;.4 0 .6 1"/>')
+
+
+def splash(W, H):
+    """Opening like diving in: hold on white, then the white tears upward into foam and bubbles over deep blue."""
+    t = OPEN - .25
+    out = [f'<rect width="{W}" height="{H}" fill="#ffffff"><animate attributeName="opacity" values="1;1;0" keyTimes="0;{t / (t + .35):.3f};1" dur="{t + .35:.2f}s" fill="freeze"/></rect>']
+    for i, (x, w) in enumerate([(40, 140), (200, 90), (320, 160), (500, 110), (630, 150), (770, 100)]):
+        d = f"M{x} {H + 40}C{x + 10} {H * .5},{x - 30} {H * .3},{x + w * .3:.0f} -40L{x + w * .7:.0f} -40C{x + w + 20} {H * .35},{x + w - 10} {H * .6},{x + w} {H + 40}Z"
+        out.append(f'<path d="{d}" fill="#ffffff" opacity="0">'
+                   f'<animate attributeName="opacity" values="0;0;.95;.95;0" keyTimes="0;{t / (t + .6):.3f};{(t + .02) / (t + .6):.3f};.8;1" dur="{t + .6:.2f}s" fill="freeze"/>'
+                   f'<animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 {-H - 80 - i * 20}" keyTimes="0;{t / (t + .6):.3f};1" dur="{t + .6:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.5 0 .8 .6"/></path>')
+    for k in range(22):  # foam bubbles that pop out as the white breaks up
+        x, y, r = (k * 137) % W, (k * 89 + 120) % H, 4 + (k * 7) % 14
+        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="#e9fbff" stroke="#ffffff" stroke-width="1.5" opacity="0">'
+                   f'<animate attributeName="opacity" values="0;0;.9;0" keyTimes="0;{t / (t + .9):.3f};{(t + .2) / (t + .9):.3f};1" dur="{t + .9:.2f}s" fill="freeze"/>'
+                   f'<animate attributeName="cy" values="{y};{y};{y - 120 - r * 6}" keyTimes="0;{t / (t + .9):.3f};1" dur="{t + .9:.2f}s" fill="freeze"/></circle>')
+    return "\n".join(out)
 
 
 def screen(user, repos, hero):
@@ -163,15 +185,9 @@ def screen(user, repos, hero):
 {"".join(rows)}
 {"".join(build)}
 <rect x="596" y="566" width="224" height="1.5" fill="#ffffff"/>
-<text x="820" y="560" text-anchor="end" font-size="14" fill="#ffffff" {KR}>무엇을 확인할까?</text>
 <text x="596" y="578" font-size="9" fill="#ffffff">Guide</text>
 <text x="820" y="592" text-anchor="end" font-size="12" fill="#ffffff">⊗ SELECT  ◎ BACK</text>
-<polygon points="-300,0 -120,0 -300,{H} -480,{H}" fill="#ff1428" opacity=".9">
-<animateTransform attributeName="transform" type="translate" values="0 0;1500 0;1500 0" keyTimes="0;.06;1" dur="9s" begin="1.2s" repeatCount="indefinite"/></polygon>
-<polygon points="-330,0 -300,0 -480,{H} -510,{H}" fill="#ffffff">
-<animateTransform attributeName="transform" type="translate" values="0 0;1500 0;1500 0" keyTimes="0;.06;1" dur="9s" begin="1.2s" repeatCount="indefinite"/></polygon>
-<polygon points="0,0 {W + 300},0 {W},{H} -300,{H}" fill="#ffffff">
-<animateTransform attributeName="transform" type="translate" values="0 0;{W + 400} 0" dur=".55s" fill="freeze" calcMode="spline" keySplines=".7 0 .3 1"/></polygon>
+{splash(W, H)}
 </g>
 </svg>'''
 
