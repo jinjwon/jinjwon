@@ -144,7 +144,7 @@ def screen(user, repos, hero):
 <text transform="translate(640 330) rotate(-62)" font-size="130" fill="#ffffff" opacity=".18">MENU</text>
 <polygon points="0,0 380,0 230,340 0,340" fill="#ffffff"/>
 <g clip-path="url(#hero)"><g><animateTransform attributeName="transform" type="translate" values="0 0;4 -9;-2 -3;0 0" dur="7s" calcMode="spline" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" repeatCount="indefinite"/>
-<image href="data:image/png;base64,{hero}" x="40" y="-20" width="380" height="380" transform="rotate(-14 230 170)"/></g></g>
+<image href="data:image/png;base64,{hero}" x="78" y="78" width="262" height="262" transform="rotate(-8 209 209)"/></g></g>
 <polygon points="380,0 404,0 254,340 230,340" fill="#0716b0"/>
 <polygon points="404,0 414,0 264,340 254,340" fill="#ffffff" opacity=".6"/>
 <text transform="translate(66 352) rotate(-90)" font-size="104" fill="#c9cfd8">PROFILE</text>
