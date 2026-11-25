@@ -41,31 +41,30 @@ def poster(avatar_bytes):
     return base64.b64encode(buf.getvalue()).decode()
 
 
-OPEN = 1.25  # seconds of the white-out + splash before the menu arrives
+OPEN = 1.1  # seconds of the white-out + splash before the menu arrives
 
 
-def slide_in(delay, dx=-700):
+def slide_in(delay, dx=-260):
     """Row waits off-screen through the opening splash, then flies in once and holds."""
-    dur = OPEN + delay + .45
-    a, b = (OPEN + delay) / dur, (OPEN + delay + .36) / dur
-    return (f'<animateTransform attributeName="transform" type="translate" values="{dx} 0;{dx} 0;12 0;0 0" keyTimes="0;{a:.3f};{b:.3f};1" '
+    dur = OPEN + delay + .5
+    a, b = (OPEN + delay) / dur, (OPEN + delay + .38) / dur
+    return (f'<animateTransform attributeName="transform" type="translate" values="{dx} 0;{dx} 0;8 0;0 0" keyTimes="0;{a:.3f};{b:.3f};1" '
             f'dur="{dur:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.2 .8 .3 1;.4 0 .6 1"/>')
 
 
 def splash(W, H):
-    """Opening like diving in: hold on white, then the white tears upward into foam and bubbles over deep blue."""
-    t = OPEN - .25
-    out = [f'<rect width="{W}" height="{H}" fill="#ffffff"><animate attributeName="opacity" values="1;1;0" keyTimes="0;{t / (t + .35):.3f};1" dur="{t + .35:.2f}s" fill="freeze"/></rect>']
-    for i, (x, w) in enumerate([(40, 140), (200, 90), (320, 160), (500, 110), (630, 150), (770, 100)]):
-        d = f"M{x} {H + 40}C{x + 10} {H * .5},{x - 30} {H * .3},{x + w * .3:.0f} -40L{x + w * .7:.0f} -40C{x + w + 20} {H * .35},{x + w - 10} {H * .6},{x + w} {H + 40}Z"
-        out.append(f'<path d="{d}" fill="#ffffff" opacity="0">'
-                   f'<animate attributeName="opacity" values="0;0;.95;.95;0" keyTimes="0;{t / (t + .6):.3f};{(t + .02) / (t + .6):.3f};.8;1" dur="{t + .6:.2f}s" fill="freeze"/>'
-                   f'<animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 {-H - 80 - i * 20}" keyTimes="0;{t / (t + .6):.3f};1" dur="{t + .6:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.5 0 .8 .6"/></path>')
-    for k in range(22):  # foam bubbles that pop out as the white breaks up
-        x, y, r = (k * 137) % W, (k * 89 + 120) % H, 4 + (k * 7) % 14
-        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="#e9fbff" stroke="#ffffff" stroke-width="1.5" opacity="0">'
-                   f'<animate attributeName="opacity" values="0;0;.9;0" keyTimes="0;{t / (t + .9):.3f};{(t + .2) / (t + .9):.3f};1" dur="{t + .9:.2f}s" fill="freeze"/>'
-                   f'<animate attributeName="cy" values="{y};{y};{y - 120 - r * 6}" keyTimes="0;{t / (t + .9):.3f};1" dur="{t + .9:.2f}s" fill="freeze"/></circle>')
+    """Opening like diving in: hold on white, the white thins out into foam that rises and pops over deep blue."""
+    t = OPEN * .5
+    out = [f'<rect width="{W}" height="{H}" fill="#ffffff"><animate attributeName="opacity" values="1;1;0" keyTimes="0;{t / OPEN:.3f};1" '
+           f'dur="{OPEN}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.5 0 .7 1"/></rect>']
+    for k in range(26):  # foam: born where the white breaks, rises with ease-out, swells and pops
+        x, y, r = (k * 137) % W, (k * 89 + 160) % H, 3 + (k * 7) % 12
+        d = OPEN + .6 + (k % 5) * .15
+        kt = f'keyTimes="0;{t / d:.3f};1" dur="{d:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.2 .7 .3 1"'
+        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="#e9fbff" fill-opacity=".35" stroke="#ffffff" stroke-width="1.5" opacity="0">'
+                   f'<animate attributeName="opacity" values="0;1;0" {kt}/>'
+                   f'<animate attributeName="cy" values="{y};{y};{y - 90 - r * 8}" keyTimes="0;{t / d:.3f};1" dur="{d:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.2 .7 .3 1"/>'
+                   f'<animate attributeName="r" values="{r * .4:.1f};{r * 1.4:.1f}" dur="{d:.2f}s" fill="freeze"/></circle>')
     return "\n".join(out)
 
 
@@ -80,9 +79,15 @@ def screen(user, repos, hero):
         shown = ";".join("1" if k == i else "0" for k in range(len(menu_words)))
         menu.append(f'<g>{slide_in(.1 + i * .07, 600)}')
         menu.append(f'<text x="{x}" y="{y}" font-size="36" fill="{["#bff6ff", "#7fe4ff", "#4fd0ff"][i % 3]}">{word}</text>')
-        menu.append(f'<g opacity="{1 if i == 0 else 0}"><animate attributeName="opacity" dur="{slot * 5}s" repeatCount="indefinite" calcMode="discrete" values="{shown}"/>'
-                    f'<polygon points="{x - 12},{y - 24} {x + w + 22:.0f},{y - 30} {x + w + 12:.0f},{y + 5} {x - 5},{y + 3}" fill="#ffffff" opacity=".9"/>'
-                    f'<text x="{x}" y="{y}" font-size="36" fill="#ff1428">{word}</text></g>')
+        a = i / len(menu_words)
+        kt = f'keyTimes="0;{a:.3f};{a + .025:.3f};{a + .05:.3f};1" dur="{slot * 5}s" repeatCount="indefinite"'
+        box = f"-12,-24 {w + 22:.0f},-30 {w + 12:.0f},5 -5,3"
+        menu.append(f'<g transform="translate({x} {y})"><g opacity="{1 if i == 0 else 0}">'
+                    f'<animate attributeName="opacity" dur="{slot * 5}s" repeatCount="indefinite" calcMode="discrete" values="{shown}"/>'
+                    f'<polygon points="{box}" fill="#ff3d9a" opacity="0"><animate attributeName="opacity" values="0;0;.8;0;0" {kt}/>'
+                    f'<animateTransform attributeName="transform" type="scale" values="1 1;1 1;1.06 1.3;1.25 1.9;1.25 1.9" {kt}/></polygon>'
+                    f'<g><animateTransform attributeName="transform" type="scale" values="0 1;0 1;1.1 1;1 1;1 1" {kt}/>'
+                    f'<polygon points="{box}" fill="#ffffff" opacity=".92"/><text font-size="36" fill="#ff1428">{word}</text></g></g></g>')
         menu.append('</g>')
 
     rows = []
@@ -98,9 +103,13 @@ def screen(user, repos, hero):
 <text x="287" y="{y + 46}" text-anchor="middle" font-size="11" fill="#0b1440" {KR}>{esc(desc)}</text>
 </g>''')
     # a quiet cursor walks down the project rows
-    cur = ";".join(f"0 {i * 54}" for i in range(len(PROJECTS)))
+    n = len(PROJECTS)
+    cur = ";".join(f"0 {i * 54};0 {i * 54}" for i in range(n)) + ";0 0"
+    ckt = ";".join(f"{i / n + (.03 if i else 0):.3f};{(i + 1) / n - .03:.3f}" for i in range(n))
+    rows.append(f'<rect x="-120" y="372" width="70" height="170" fill="#ffffff" opacity=".22" transform="skewX(-20)">'
+                f'<animate attributeName="x" values="-120;-120;700" keyTimes="0;.8;1" dur="6s" begin="{OPEN + 1}s" repeatCount="indefinite"/></rect>')
     rows.append(f'<polygon points="22,386 528,380 520,422 16,428" fill="none" stroke="#ffffff" stroke-width="2.5">'
-                f'<animateTransform attributeName="transform" type="translate" dur="{len(PROJECTS) * 1.6}s" repeatCount="indefinite" calcMode="discrete" values="{cur}"/></polygon>')
+                f'<animateTransform attributeName="transform" type="translate" dur="{len(PROJECTS) * 1.6}s" repeatCount="indefinite" values="{cur}" keyTimes="0;{ckt};1" calcMode="spline" keySplines="{";".join([".4 0 .2 1"] * (2 * n))}"/></polygon>')
 
     build = []
     for i, r in enumerate(repos):
@@ -111,11 +120,6 @@ def screen(user, repos, hero):
 <text x="806" y="{y + 20}" text-anchor="end" font-size="11" fill="#1673ef">{esc(r.get("language") or "—")}</text>
 </g>''')
 
-    shards = "".join(
-        f'<polygon points="0,0 {w},{h * .3:.0f} {w * .3:.0f},{h}" fill="{c}" opacity=".8" transform="translate({x} {y})">'
-        f'<animateTransform attributeName="transform" type="translate" values="{x} {y};{x + dx} {y - 24};{x} {y}" dur="{d}s" repeatCount="indefinite"/></polygon>'
-        for x, y, w, h, c, dx, d in [(250, 262, 16, 22, "#ff3d9a", 8, 5), (300, 318, 12, 16, "#3047ff", -6, 6.5), (205, 300, 10, 18, "#8f4dff", 5, 4.4),
-                                     (430, 40, 14, 12, "#ffffff", -8, 7), (785, 120, 12, 16, "#ff3d9a", 6, 5.6), (540, 560, 18, 12, "#bff3ff", -7, 6)])
     caustics = "".join(
         f'<path d="M{x} {y}q{rx * .4:.0f} {-ry} {rx:.0f} 0t{rx * .8:.0f} {ry * .6:.0f}q{-rx * .9:.0f} {ry * 1.4:.0f} {-rx * 1.8:.0f} 0z" fill="#d8f6ff" opacity="{o}">'
         f'<animateTransform attributeName="transform" type="translate" values="0 0;{dx} 4;0 0" dur="{d}s" repeatCount="indefinite"/></path>'
@@ -153,7 +157,9 @@ def screen(user, repos, hero):
 <defs>
 <linearGradient id="bg" x1="0" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="#55d3ff"/><stop offset=".4" stop-color="#1673ef"/><stop offset="1" stop-color="#0716b0"/></linearGradient>
 <clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath>
-<clipPath id="hero"><polygon points="128,84 344,74 220,340 70,340"/></clipPath>
+<radialGradient id="glow" cx=".28" cy=".22" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".4" stop-color="#e9fbff" stop-opacity=".8"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+<radialGradient id="fade"><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></radialGradient>
+<mask id="soft"><circle r="150" fill="url(#fade)"/></mask>
 </defs>
 <g clip-path="url(#c)" {FONT}>
 <rect width="{W}" height="{H}" fill="url(#bg)"/>
@@ -164,19 +170,16 @@ def screen(user, repos, hero):
 {streaks}
 <text transform="translate(690 640) rotate(-62)" font-size="170" fill="#ffffff" opacity=".18">LIST</text>
 <text transform="translate(640 330) rotate(-62)" font-size="130" fill="#ffffff" opacity=".18">MENU</text>
-<polygon points="0,0 380,0 230,340 0,340" fill="#ffffff"/>
-<g clip-path="url(#hero)"><g><animateTransform attributeName="transform" type="translate" values="0 0;4 -9;-2 -3;0 0" dur="7s" calcMode="spline" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1" repeatCount="indefinite"/>
-<image href="data:image/png;base64,{hero}" x="78" y="78" width="262" height="262" transform="rotate(-8 209 209)"/></g></g>
-<polygon points="380,0 404,0 254,340 230,340" fill="#0716b0"/>
-<polygon points="404,0 414,0 264,340 254,340" fill="#ffffff" opacity=".6"/>
-<text transform="translate(66 352) rotate(-90)" font-size="104" fill="#c9cfd8">PROFILE</text>
-<text transform="translate(58 346) rotate(-90)" font-size="104" fill="#0b0b0b">PROFILE</text>
+<ellipse cx="170" cy="120" rx="330" ry="250" fill="url(#glow)"/>
+<text transform="translate(58 346) rotate(-90)" font-size="104" fill="#ffffff" opacity=".22">PROFILE</text>
+<g transform="translate(215 190)"><g><animateTransform attributeName="transform" type="translate" values="-6 -10;4 8;-6 -10" dur="10s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
+<g><animateTransform attributeName="transform" type="rotate" values="164;171;164" dur="13s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
+<g mask="url(#soft)"><image href="data:image/png;base64,{hero}" x="-150" y="-150" width="300" height="300"/></g></g></g></g>
 <g transform="rotate(-2 200 50)">
 <rect x="92" y="18" width="220" height="50" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.5"/>
 <text x="102" y="44" font-size="22" fill="#0b0b0b">{name}</text>
 <text x="103" y="60" font-size="9" fill="#0b0b0b" {KR}>{bio}</text>
 </g>
-{shards}
 {bubbles}
 {sparkles}
 <g transform="translate(486 92) rotate(-7) skewX(-6)">{"".join(menu)}</g>
