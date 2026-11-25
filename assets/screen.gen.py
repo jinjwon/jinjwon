@@ -14,7 +14,7 @@ FONT = 'font-family="P3,KRH,sans-serif"'
 F4 = 'font-family="P4,KRH,sans-serif"'
 F5 = 'font-family="P5B,KRH,sans-serif"'
 KR = 'font-family="KRB,sans-serif" font-style="normal"'
-FONTS = {"P4S": "KaushanScript-Regular.ttf", "P3": "BarlowCondensed-ExtraBoldItalic.ttf", "P4": "Anton-Regular.ttf", "P5A": "AbrilFatface-Regular.ttf",
+FONTS = {"P3": "Barlow-BlackItalic.ttf", "P4R": "PTSerif-Bold.ttf", "P4": "Anton-Regular.ttf", "P5A": "AbrilFatface-Regular.ttf",
          "P5B": "ArchivoBlack-Regular.ttf", "KRH": "BlackHanSans-Regular.ttf", "KRB": "DoHyeon-Regular.ttf"}
 
 
@@ -66,7 +66,7 @@ def esc(s):
 
 
 TONES = {"p3r": [(7, 22, 176), (22, 115, 239), (127, 228, 255), (255, 255, 255)],
-         "p4": [(24, 24, 24), (120, 108, 60), (255, 222, 0), (255, 255, 255)],
+         "p4": [(46, 13, 58), (190, 104, 12), (255, 214, 20), (255, 250, 214)],
          "p5": [(12, 12, 12), (12, 12, 12), (214, 0, 24), (255, 255, 255)]}
 
 
@@ -127,6 +127,18 @@ def splash(W, H):
     return "\n".join(out)
 
 
+def buttons(x, y, fg, bg, labels):
+    """Round controller-button hints, right-aligned at x."""
+    out = []
+    for key, label in reversed(labels):
+        w = textw(label, "P3", 15)
+        x -= w
+        out.append(f'<text x="{x:.0f}" y="{y}" font-size="15" fill="{fg}" font-family="P3">{label}</text>'
+                   f'<circle cx="{x - 12:.0f}" cy="{y - 5}" r="8" fill="{fg}"/><text x="{x - 12:.0f}" y="{y - 1}" text-anchor="middle" font-size="11" fill="{bg}" font-family="P3">{key}</text>')
+        x -= 32
+    return "".join(out)
+
+
 def screen_p3r(user, repos, hero):
     """Layout read off P3R pause-menu frames: full-bleed water, character bleeding off the left, a tilted
     stack of words center-right (selected = red on a white jagged tag), wallet box top-left, help line bottom-right."""
@@ -139,24 +151,25 @@ def screen_p3r(user, repos, hero):
 
     menu, help_ = [], []
     for i, (word, desc) in enumerate(items):
-        x, y = [0, -14, 6, -8, 10, -4, 4][i % 7], i * 40
-        w = textw(word, "P3", 48)
+        x, y = [0, -16, 6, -10, 12, -4, 6][i % 7], i * 40
+        fs = [40, 52, 40, 50, 38, 46, 42][i % 7]  # every word its own size, lines biting into each other
+        w = textw(word, "P3", fs)
         on = ";".join("1" if k == i else "0" for k in range(n))
         a = i / n
         kt = f'keyTimes="0;{a:.3f};{a + .02:.3f};{a + .05:.3f};1" {cyc}'
         off = ";".join("0" if v == "1" else "1" for v in on.split(";"))
-        white = f"-4,-4 {w + 120:.0f},-74 {w + 36:.0f},-12 14,12"
-        pink = f"-34,16 {w + 76:.0f},-30 {w + 24:.0f},2 -24,24"
+        white = f"-20,-18 {w + 112:.0f},-48 {w + 18:.0f},6 -6,12"
+        pink = f"-36,18 {w + 70:.0f},-14 {w + 22:.0f},6 -26,26"
         menu.append(f'<g>{slide_in(.05 + i * .05, 420)}<g transform="translate({x} {y})">'
                     f'<g opacity="{0 if i == 0 else 1}"><animate attributeName="opacity" calcMode="discrete" values="{off}" {cyc}/>'
-                    f'<text x="3" y="3" font-size="48" fill="#0a2a9e" opacity=".5">{esc(word)}</text>'
-                    f'<text font-size="48" fill="{["#bff6ff", "#7fe4ff"][i % 2]}">{esc(word)}</text></g>'
+                    f'<text x="3" y="3" font-size="{fs}" letter-spacing="-1.5" fill="#00128f" opacity=".45">{esc(word)}</text>'
+                    f'<text font-size="{fs}" letter-spacing="-1.5" fill="{["#8ffbff", "#52e6ff", "#aef4ff", "#2fc4ff"][i % 4]}">{esc(word)}</text></g>'
                     f'<g opacity="{1 if i == 0 else 0}"><animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>'
                     f'<g><animateTransform attributeName="transform" type="scale" values="0 1;0 1;1.15 1;1 1;1 1" {kt}/>'
                     f'<polygon points="{pink}" fill="#ff3d9a"/><polygon points="{white}" fill="#ffffff"/></g>'
                     f'<g transform="translate(-14 2) scale(1.18)"><animateTransform attributeName="transform" type="translate" additive="sum" values="-30 0;-30 0;4 0;0 0;0 0" {kt}/>'
-                    f'<text x="-4" y="5" font-size="48" fill="#0b0b0b">{esc(word)}</text><text font-size="48" fill="#ff1428">{esc(word)}</text></g></g></g></g>')
-        help_.append(f'<text x="930" y="500" text-anchor="end" font-size="14" fill="#ffffff" {KR} opacity="{1 if i == 0 else 0}">'
+                    f'<text x="-4" y="5" font-size="{fs}" letter-spacing="-1.5" fill="#0b0b0b">{esc(word)}</text><text font-size="{fs}" letter-spacing="-1.5" fill="url(#split)">{esc(word)}</text></g></g></g></g>')
+        help_.append(f'<text x="930" y="478" text-anchor="end" font-size="18" fill="#ffffff" {KR} opacity="{1 if i == 0 else 0}">'
                      f'<animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>{esc(desc)}</text>')
 
     caustics = "".join(
@@ -184,7 +197,8 @@ def screen_p3r(user, repos, hero):
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="{name} — profile menu: projects GOGO, 광탈페, EXPO, recent repositories and portfolio.">
 <defs>
-<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fd6ff"/><stop offset=".35" stop-color="#1673ef"/><stop offset="1" stop-color="#0716b0"/></linearGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2ff2ff"/><stop offset=".38" stop-color="#0a74ff"/><stop offset="1" stop-color="#0000c4"/></linearGradient>
+<linearGradient id="split" x1="0" y1="0" x2="1" y2=".35"><stop offset=".2" stop-color="#14000a"/><stop offset=".2" stop-color="#ff1428"/></linearGradient>
 <radialGradient id="glow" cx=".2" cy=".3" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#e9fbff" stop-opacity=".75"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
 <radialGradient id="fade"><stop offset=".55" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></radialGradient>
 <linearGradient id="lf" x1="0" x2="1"><stop offset=".6" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></linearGradient>
@@ -199,16 +213,17 @@ def screen_p3r(user, repos, hero):
 <g transform="translate(300 270)"><g><animateTransform attributeName="transform" type="translate" values="0 -6;0 8;0 -6" dur="8s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
 <g mask="url(#half)"><image href="data:image/png;base64,{hero}" x="-300" y="-300" width="600" height="600"/></g></g></g>
 <path d="M0 0H94C122 90 72 170 102 260S70 430 106 540H0Z" fill="#ffffff"/>
-<text transform="translate(76 {H - 8}) rotate(-90)" font-size="112" fill="#0b0b0b">PROFILE</text>
+<text transform="translate(80 214) rotate(-97)" font-size="108" fill="#aab2bd">{user.get("public_repos", 0):02d}</text>
+<text transform="translate(86 {H + 4}) rotate(-96)" font-size="102" letter-spacing="-4" fill="#0b0b0b">PROFILE</text>
 <g transform="rotate(-2 180 40)"><rect x="84" y="16" width="200" height="46" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.5"/>
 <text x="94" y="40" font-size="20" fill="#0b0b0b">{name}</text><text x="95" y="55" font-size="9" fill="#0b0b0b" {KR}>{bio}</text></g>
 {bubbles}
 {confetti}
 <g transform="translate(500 128) rotate(-18) skewX(-8)">{"".join(menu)}</g>
-<rect x="640" y="482" width="296" height="1.5" fill="#ffffff"/>
-<text x="640" y="476" font-size="10" fill="#ffffff">Guide</text>
 {"".join(help_)}
-<text x="930" y="524" text-anchor="end" font-size="13" fill="#ffffff">⊗ CONFIRM  ◎ CLOSE</text>
+<rect x="620" y="488" width="330" height="1.5" fill="#ffffff"/>
+<text x="624" y="500" font-size="10" fill="#ffffff">Command</text>
+{buttons(932, 522, "#ffffff", "#0000c4", [("A", "Confirm"), ("B", "Close")])}
 {splash(W, H)}
 </g>
 </svg>'''
@@ -232,69 +247,77 @@ def p5_wipe(W, H):
     return "".join(out)
 
 
-def status_card(user, x, y):
-    """Party-status card (P4R style): repos and followers shown as HP/SP bars."""
-    name = esc((user.get("name") or user["login"]).upper())
-    rp, fl = user.get("public_repos", 0), user.get("followers", 0)
-    return (f'<g transform="translate({x} {y}) skewX(-12)"><rect width="300" height="66" fill="#1b2a8c"/><rect width="300" height="3" fill="#6fd3ff"/>'
-            f'<text x="14" y="30" font-size="20" fill="#ffffff">{name}</text>'
-            f'<text x="150" y="24" font-size="11" fill="#9fe8ff">REPO</text><text x="286" y="24" text-anchor="end" font-size="16" fill="#ffffff">{rp}</text>'
-            f'<rect x="150" y="29" width="136" height="5" fill="#0b1440"/><rect x="150" y="29" width="{136 * min(rp / 30, 1):.0f}" height="5" fill="#3fd6ff"/>'
-            f'<text x="150" y="50" font-size="11" fill="#b8ff8a">FOLLOW</text><text x="286" y="50" text-anchor="end" font-size="16" fill="#ffffff">{fl}</text>'
-            f'<rect x="150" y="55" width="136" height="5" fill="#0b1440"/><rect x="150" y="55" width="{136 * min(fl / 30, 1):.0f}" height="5" fill="#7cf05a"/></g>')
-
-
 def screen_p4(user, repos, hero):
-    """After P4 Revival menu frames: a yellow stairway world under a light beam, the character on the left,
-    a huge script word, the menu as navy party bars stepping down the right (the picked bar flips white and
-    pushes out), a status card and a black help strip."""
+    """P4 Revival pause menu (docs/persona-ui-style.md): yellow split by a diagonal window of blue sky, bold
+    serif words stepping down the diagonal (dark on yellow, yellow on the dark mass), the picked one huge and
+    white with TV colour fringing, fat round flowers, drifting petals, a dark pill help line."""
     W, H = 960, 540
     items = menu_items(repos); n = len(items)
     menu, help_ = [], []
     for i, (word, desc) in enumerate(items):
         on, kt, cyc = cycle(i, n)
-        x, y = 560 + i * 10, 74 + i * 50
-        bw = W - x + 30
-        bar = f"0,0 {bw},0 {bw},40 -14,40"
-        tail = esc(desc.split(" · ")[-1])
-        menu.append(f'<g>{slide_in(.05 + i * .05, 460)}<g transform="translate({x} {y})">'
-                    f'<polygon points="{bar}" fill="#1b2a8c"/><rect width="{bw}" height="3" fill="#6fd3ff"/>'
-                    f'<text x="14" y="31" font-size="26" fill="#ffffff">{esc(word)}</text>'
-                    f'<text x="{W - x - 14}" y="28" text-anchor="end" font-size="12" fill="#9fe8ff" {KR}>{tail}</text>'
+        word = word.title()
+        x, y = i * 24, i * 52
+        dark_on_light = i < 3
+        fill, shade = ("#3a2400", "#e8a800") if dark_on_light else ("#ffe83d", "#14021c")
+        w = textw(word, "P4R", 46)
+        off = ";".join("0" if v == "1" else "1" for v in on.split(";"))
+        wedge = f"-50,-30 {w * .5:.0f},-44 {w * .28:.0f},6 -18,22"
+        txt = lambda dx, dy, c, extra="": f'<text x="{dx}" y="{dy}" font-size="46" fill="{c}" font-family="P4R,KRH" {extra}>{esc(word)}</text>'
+        menu.append(f'<g>{slide_in(.05 + i * .06, -300)}<g transform="translate({x} {y})">'
+                    f'<g opacity="{0 if i == 0 else 1}"><animate attributeName="opacity" calcMode="discrete" values="{off}" {cyc}/>{txt(4, 4, shade)}{txt(0, 0, fill)}</g>'
                     f'<g opacity="{1 if i == 0 else 0}"><animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>'
-                    f'<g><animateTransform attributeName="transform" type="translate" values="0 0;0 0;-30 0;-22 0;-22 0" {kt}/>'
-                    f'<polygon points="{bar}" fill="#ffffff" stroke="#141414" stroke-width="3"/><polygon points="-16,0 -4,0 -18,40 -30,40" fill="#ff8a00"/>'
-                    f'<text x="14" y="31" font-size="26" fill="#141414">{esc(word)}</text>'
-                    f'<text x="{W - x - 14}" y="28" text-anchor="end" font-size="12" fill="#1b2a8c" {KR}>{tail}</text></g></g></g></g>')
-        help_.append(f'<text x="936" y="530" text-anchor="end" font-size="14" fill="#ffffff" {KR} opacity="{1 if i == 0 else 0}">'
+                    f'<g transform="translate(-6 4) scale(1.28)"><animateTransform attributeName="transform" type="scale" additive="sum" values=".7 .7;.7 .7;1.12 1.12;1 1;1 1" {kt}/>'
+                    f'<polygon points="{wedge}" fill="url(#shard)"/>{txt(6, 6, "#14021c")}'
+                    f'<g opacity=".9"><animateTransform attributeName="transform" type="translate" values="-3 0;-7 1;-2 -1;-3 0" dur=".5s" repeatCount="indefinite"/>{txt(0, 0, "#ff1f6b")}</g>'
+                    f'<g opacity=".9"><animateTransform attributeName="transform" type="translate" values="3 0;7 -1;2 1;3 0" dur=".5s" repeatCount="indefinite"/>{txt(0, 0, "#12d6ff")}</g>'
+                    f'{txt(0, 0, "#ffffff")}</g></g></g></g>')
+        help_.append(f'<text x="936" y="486" text-anchor="end" font-size="15" fill="#ffffff" {KR} opacity="{1 if i == 0 else 0}">'
                      f'<animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>{esc(desc)}</text>')
-    stairs = "".join(f'<polygon points="{x},{H} {x + 46},{H} {x + 380},0 {x + 334},0" fill="#f5b400"/>' for x in range(-380, W, 96))
-    def daisy(x, y, r, d, b):
-        petals = "".join(f'<ellipse cx="0" cy="{-r}" rx="{r * .42:.1f}" ry="{r * .7:.1f}" fill="#ffffff" transform="rotate({a})"/>' for a in range(0, 360, 60))
-        return (f'<g transform="translate({x} {y})"><g><animateTransform attributeName="transform" type="rotate" values="0;360" dur="{d}s" begin="{b}s" repeatCount="indefinite"/>'
-                f'{petals}<circle r="{r * .45:.1f}" fill="#ffb300"/></g></g>')
-    flowers = "".join(daisy(*f) for f in [(470, 40, 14, 14, 0), (520, 470, 12, 12, 1), (430, 300, 9, 16, 0)])
-    scan = "".join(f'<rect y="{y}" width="{W}" height="1" fill="#000" opacity=".05"/>' for y in range(0, H, 4))
-    name = esc((user.get("name") or user["login"]).upper()); bio = esc((user.get("bio") or "product designer · vibe coder")[:40])
+
+    def flower(x, y, r, color, d, fringe=False):
+        petals = "".join(f'<ellipse cx="0" cy="{-r * .62:.0f}" rx="{r * .25:.0f}" ry="{r * .42:.0f}" transform="rotate({a})"/>' for a in range(0, 360, 60))
+        body = f'<circle r="{r * .2:.0f}"/>{petals}'
+        ghost = (f'<g fill="#ff1f6b" transform="translate(-4 0)">{body}</g><g fill="#18e06b" transform="translate(4 0)">{body}</g>') if fringe else ""
+        return (f'<g transform="translate({x} {y})"><g><animateTransform attributeName="transform" type="rotate" values="0;360" dur="{d}s" repeatCount="indefinite"/>'
+                f'{ghost}<g fill="{color}">{body}</g></g></g>')
+
+    def cloud(x, y, k, d):
+        puffs = "".join(f'<circle cx="{a * k:.0f}" cy="{b * k:.0f}" r="{r * k:.0f}"/>' for a, b, r in [(0, 0, 26), (30, -14, 30), (62, -2, 24), (90, 8, 16), (-26, 10, 16), (34, 8, 28)])
+        return (f'<g transform="translate({x} {y})"><g fill="#ffffff"><animateTransform attributeName="transform" type="translate" values="0 0;34 0;0 0" dur="{d}s" repeatCount="indefinite"/>{puffs}</g></g>')
+
+    petals = "".join(
+        f'<g><animateTransform attributeName="transform" type="translate" values="{x} -20;{x - 120} {H + 20}" dur="{d}s" begin="{b}s" repeatCount="indefinite"/>'
+        f'<ellipse rx="9" ry="3.5" fill="#fff06a"><animateTransform attributeName="transform" type="rotate" values="0;360" dur="{d / 4:.1f}s" repeatCount="indefinite"/></ellipse></g>'
+        for x, d, b in [(380, 9, 0), (560, 11, 2.5), (700, 8, 1), (860, 12, 4), (940, 10, 6)])
+    sky = "430,0 960,0 960,196 610,258 452,330 296,178"
+    name = esc((user.get("name") or user["login"]).split()[0].title()); bio = esc((user.get("bio") or "product designer · vibe coder")[:40])
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="{name} — profile menu: projects GOGO, 광탈페, EXPO, recent repositories and portfolio.">
-<defs><linearGradient id="lf" x1="0" x2="1"><stop offset=".6" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></linearGradient>
-<mask id="half"><rect x="-300" y="-300" width="600" height="600" fill="url(#lf)"/></mask><clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath></defs>
+<defs><linearGradient id="y" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe92e"/><stop offset=".6" stop-color="#ffd000"/><stop offset="1" stop-color="#ff8a00"/></linearGradient>
+<linearGradient id="skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f9dff"/><stop offset="1" stop-color="#a9e6ff"/></linearGradient>
+<linearGradient id="shard" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2742ff"/><stop offset=".6" stop-color="#ffffff"/></linearGradient>
+<linearGradient id="lf" x1="0" x2="1"><stop offset=".68" stop-color="#ffffff"/><stop offset=".9" stop-color="#000000"/></linearGradient>
+<mask id="half"><rect x="-300" y="-300" width="600" height="600" fill="url(#lf)"/></mask>
+<clipPath id="sk"><polygon points="{sky}"/></clipPath><clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath></defs>
 <g clip-path="url(#c)" {F4}>
-<rect width="{W}" height="{H}" fill="#ffd400"/>
-<g opacity=".55">{stairs}</g>
-<polygon points="0,0 300,0 640,{H} 360,{H}" fill="#ffffff" opacity=".28"><animate attributeName="opacity" values=".22;.34;.22" dur="5s" repeatCount="indefinite"/></polygon>
-<text x="940" y="170" text-anchor="end" font-size="190" fill="#e88a00" opacity=".8" font-family="P4S">Profile</text>
-<g transform="translate(270 290)"><g><animateTransform attributeName="transform" type="translate" values="0 -6;0 8;0 -6" dur="8s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
+<rect width="{W}" height="{H}" fill="url(#y)"/>
+<g clip-path="url(#sk)"><rect width="{W}" height="340" fill="url(#skyg)"/>{cloud(800, 176, 1.1, 14)}{cloud(800, 100, .9, 19)}{cloud(450, 60, .6, 11)}</g>
+<g transform="translate(236 290)"><g><animateTransform attributeName="transform" type="translate" values="0 -4;0 6;0 -4" dur="7s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
 <g mask="url(#half)"><image href="data:image/png;base64,{hero}" x="-300" y="-300" width="600" height="600"/></g></g></g>
-{flowers}
-<g transform="rotate(-2 140 40)"><rect x="20" y="16" width="220" height="48" fill="#141414"/>
-<text x="32" y="44" font-size="24" fill="#ffffff">{name}</text><text x="33" y="58" font-size="9" fill="#ffde00" {KR}>{bio}</text></g>
-{status_card(user, 40, 424)}
-{"".join(menu)}
-<rect y="508" width="{W}" height="32" fill="#141414"/><rect y="508" width="{W}" height="3" fill="#ff8a00"/>
-<text x="24" y="530" font-size="13" fill="#ffde00">⊗ CONFIRM  ◎ BACK</text>
+<polygon points="440,318 650,214 726,262 560,356" fill="#7a5414"/>
+<polygon points="262,540 372,430 428,324 452,214 640,204 790,236 826,288 884,306 846,540" fill="#2e0b3c"/>
+<polygon points="884,306 960,284 960,540 846,540" fill="#ffb000" opacity=".75"/>
+<line x1="286" y1="528" x2="640" y2="274" stroke="#ffe83d" stroke-width="2" stroke-dasharray="9 7" opacity=".8"/>
+{flower(790, 468, 92, "#ffe83d", 40)}{flower(70, 506, 62, "#ffffff", 30, True)}{flower(300, 82, 17, "#e8a800", 18)}
+{petals}
+<g transform="translate(366 112) rotate(-14)">{"".join(menu)}</g>
+<text x="934" y="50" text-anchor="end" font-size="38" fill="#ffffff" stroke="#0d3f8f" stroke-width="5" paint-order="stroke" font-family="P4R">{name}</text>
+<text x="934" y="72" text-anchor="end" font-size="13" fill="#ffffff" stroke="#0d3f8f" stroke-width="3" paint-order="stroke" {KR}>{bio}</text>
+<text x="470" y="522" font-size="30" fill="#ffe83d" stroke="#14021c" stroke-width="4" paint-order="stroke" font-family="P4R">★ {user.get("public_repos", 0)} <tspan font-size="15">repos</tspan></text>
+<rect x="636" y="465" width="340" height="31" rx="15" fill="#14021c" opacity=".9"/><text x="654" y="486" font-size="15" fill="#ffe83d" {KR}>✦</text>
 {"".join(help_)}
-{scan}
+<rect x="738" y="504" width="212" height="28" rx="14" fill="#14021c" opacity=".9"/>
+{buttons(936, 524, "#ffffff", "#14021c", [("A", "Confirm"), ("B", "Back")])}
 {tv_on(W, H)}
 </g>
 </svg>"""
