@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install pillow==11.0.0
+      - run: pip install pillow==11.0.0 fonttools==4.55.0
       - run: python assets/screen.gen.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
