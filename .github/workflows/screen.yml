@@ -1,12 +1,10 @@
 # Regenerates assets/screen.svg from the live GitHub profile (avatar, name, bio, recent repos).
-# The theme follows Korean time, so it runs at each switch (06:07 P3R, 12:07 P4, 18:07 P5 KST),
-# on edits to the generator, and on demand. GitHub has no "profile changed" event; these runs pick that up too.
+# The theme follows Korean time (06 P3R, 12 P4, 18 P5 KST). GitHub delays and drops scheduled runs,
+# so it asks every 30 minutes; the output is deterministic and only a real change commits. Also runs on edits to the generator, and on demand. GitHub has no "profile changed" event; these runs pick that up too.
 name: profile screen
 on:
   schedule:
-    - cron: "7 21 * * *"
-    - cron: "7 3 * * *"
-    - cron: "7 9 * * *"
+    - cron: "17,47 * * * *"
   push:
     branches: [main]
     paths: [assets/screen.gen.py, .github/workflows/screen.yml]

@@ -39,7 +39,7 @@ def embed_fonts(svg):
     for fam, file in FONTS.items():
         if not re.search(rf'font-family="[^"]*\b{fam}\b', svg):
             continue
-        font, opts = TTFont(os.path.join(HERE, "fonts", file)), Options()
+        font, opts = TTFont(os.path.join(HERE, "fonts", file), recalcTimestamp=False), Options()
         opts.layout_features, opts.name_IDs, opts.notdef_outline = ["kern", "liga"], [], True
         sub = Subsetter(opts); sub.populate(text=text); sub.subset(font)
         buf = io.BytesIO(); font.save(buf)
@@ -366,19 +366,16 @@ def screen_p5(user, repos, hero):
     shards = "".join(f'<polygon points="{p}" fill="#0b0b0b"/>' for p in ["0,0 150,0 40,540 0,540", "560,0 640,0 520,540 470,540"])
     stars = "".join(f'<path d="M0 -{r}L{r * .3:.0f} -{r * .3:.0f}L{r} 0L{r * .3:.0f} {r * .3:.0f}L0 {r}L-{r * .3:.0f} {r * .3:.0f}L-{r} 0L-{r * .3:.0f} -{r * .3:.0f}Z" fill="#0b0b0b" transform="translate({x} {y})">'
                     f'<animateTransform attributeName="transform" type="rotate" values="0 {x} {y};90 {x} {y}" dur="{d}s" repeatCount="indefinite" additive="sum"/></path>'
-                    for x, y, r, d in [(520, 60, 16, 6), (900, 360, 14, 5), (600, 470, 12, 7)])
+                    for x, y, r, d in [(540, 40, 16, 6), (944, 400, 12, 5), (500, 490, 12, 7)])
     rp = user.get("public_repos", 0)
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="{esc((user.get("name") or user["login"]).upper())} — profile menu: projects GOGO, 광탈페, EXPO, recent repositories and portfolio.">
 <defs><pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="5" cy="5" r="2.2" fill="#000000"/></pattern>
 <pattern id="zig" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="18" height="18" fill="#ffffff"/><rect width="9" height="18" fill="#0b0b0b"/></pattern>
-<linearGradient id="rf" x1="0" x2="1"><stop offset="0" stop-color="#000000"/><stop offset=".35" stop-color="#ffffff"/></linearGradient>
-<mask id="right"><rect x="-300" y="-300" width="600" height="600" fill="url(#rf)"/></mask><clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath></defs>
+<clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath></defs>
 <g clip-path="url(#c)" {F5}>
 <rect width="{W}" height="{H}" fill="#a3000f"/>
 <rect width="{W}" height="{H}" fill="url(#dots)" opacity=".22"/>
 {shards}
-<g transform="translate(730 300)"><g><animateTransform attributeName="transform" type="translate" values="0 -6;0 8;0 -6" dur="8s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
-<g mask="url(#right)"><image href="data:image/png;base64,{hero}" x="-300" y="-300" width="600" height="600"/></g></g></g>
 <polygon points="470,540 560,250 700,60 820,0 700,200 640,540" fill="#ff1a2e"/>
 <polygon points="880,0 960,0 960,300 910,300" fill="url(#zig)"/><polygon points="866,0 880,0 910,300 896,300" fill="#0b0b0b"/>
 <g transform="translate(300 170)"><g><animateTransform attributeName="transform" type="rotate" values="0;360" dur="40s" repeatCount="indefinite"/>
@@ -387,6 +384,9 @@ def screen_p5(user, repos, hero):
 <polygon points="-30,-112 {lw + 40:.0f},-128 {lw + 26:.0f},34 {lw * .55:.0f},22 -40,40" fill="#ffffff" stroke="#0b0b0b" stroke-width="5"/>{logo}</g></g>
 <g transform="translate(110 262) rotate(-7)"><rect width="370" height="30" fill="#0b0b0b"/><text x="14" y="21" font-size="15" fill="#ffffff" {KR}>{esc((user.get("bio") or "product designer · vibe coder")[:40])}</text></g>
 {stars}
+<g transform="translate(724 262) rotate(4)"><g><animateTransform attributeName="transform" type="translate" values="0 -5;0 6;0 -5" dur="8s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
+<polygon points="-206,-196 200,-210 212,198 -194,214" fill="#0b0b0b"/><rect x="-188" y="-188" width="376" height="376" fill="#ffffff"/>
+<image href="data:image/png;base64,{hero}" x="-180" y="-180" width="360" height="360"/></g></g>
 <g transform="translate(130 336) rotate(-7)">{"".join(menu)}</g>
 <g transform="translate(40 512) rotate(-6)"><text font-size="38" fill="#ffffff" stroke="#0b0b0b" stroke-width="6" paint-order="stroke" font-family="P5A">★{rp}</text><text x="{textw(f"★{rp}", "P5A", 38) + 8:.0f}" font-size="14" fill="#ffffff">REPOS</text></g>
 <polygon points="690,492 960,484 960,540 676,540" fill="#0b0b0b"/>
