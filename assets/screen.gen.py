@@ -69,127 +69,82 @@ def splash(W, H):
 
 
 def screen(user, repos, hero):
-    W, H = 840, 600
-    menu_words = ["PROJECT", "BUILD", "SKILL", "CONTACT", "PORTFOLIO"]
-    slot = 1.4
-    menu = []
-    for i, word in enumerate(menu_words):
-        x, y = [0, 26, 10, 38, 6][i], i * 40
-        w = len(word) * 36 * .74
-        shown = ";".join("1" if k == i else "0" for k in range(len(menu_words)))
-        menu.append(f'<g>{slide_in(.1 + i * .07, 600)}')
-        menu.append(f'<text x="{x}" y="{y}" font-size="36" fill="{["#bff6ff", "#7fe4ff", "#4fd0ff"][i % 3]}">{word}</text>')
-        a = i / len(menu_words)
-        kt = f'keyTimes="0;{a:.3f};{a + .025:.3f};{a + .05:.3f};1" dur="{slot * 5}s" repeatCount="indefinite"'
-        box = f"-12,-24 {w + 22:.0f},-30 {w + 12:.0f},5 -5,3"
-        menu.append(f'<g transform="translate({x} {y})"><g opacity="{1 if i == 0 else 0}">'
-                    f'<animate attributeName="opacity" dur="{slot * 5}s" repeatCount="indefinite" calcMode="discrete" values="{shown}"/>'
-                    f'<polygon points="{box}" fill="#ff3d9a" opacity="0"><animate attributeName="opacity" values="0;0;.8;0;0" {kt}/>'
-                    f'<animateTransform attributeName="transform" type="scale" values="1 1;1 1;1.06 1.3;1.25 1.9;1.25 1.9" {kt}/></polygon>'
-                    f'<g><animateTransform attributeName="transform" type="scale" values="0 1;0 1;1.1 1;1 1;1 1" {kt}/>'
-                    f'<polygon points="{box}" fill="#ffffff" opacity=".92"/><text font-size="36" fill="#ff1428">{word}</text></g></g></g>')
-        menu.append('</g>')
+    """Layout read off P3R pause-menu frames: full-bleed water, character bleeding off the left, a tilted
+    stack of words center-right (selected = red on a white jagged tag), wallet box top-left, help line bottom-right."""
+    W, H = 960, 540
+    items = [(n, f"{d} · {t}") for n, t, d in PROJECTS]
+    items += [(r["name"].upper(), f"{r.get('language') or 'code'} · recently pushed") for r in repos[:3]]
+    items += [("PORTFOLIO", "전체 포트폴리오 보기 · framer")]
+    n, slot = len(items), 1.6
+    cyc = f'dur="{slot * n}s" repeatCount="indefinite"'
 
-    rows = []
-    for i, (name, term, desc) in enumerate(PROJECTS):
-        y = 392 + i * 54
-        rows.append(f'''<g>{slide_in(.35 + i * .1)}
-<polygon points="34,{y} 520,{y - 6} 514,{y + 30} 28,{y + 36}" fill="#14206e"/>
-<rect x="44" y="{y + 4}" width="20" height="28" rx="2" fill="#14206e" stroke="#8ff0ff" stroke-width="2" transform="rotate(-9 54 {y + 18})"/>
-<text x="54" y="{y + 25}" text-anchor="middle" font-size="14" fill="#8ff0ff" font-style="normal" font-family="Georgia,serif">{NUMERALS[i]}</text>
-<text x="78" y="{y + 26}" font-size="22" fill="#8ff0ff">{esc(name)}</text>
-<text x="506" y="{y + 24}" text-anchor="end" font-size="16" fill="#8ff0ff">{term}</text>
-<polygon points="70,{y + 34} 508,{y + 30} 504,{y + 48} 66,{y + 52}" fill="#8ff0ff"/>
-<text x="287" y="{y + 46}" text-anchor="middle" font-size="11" fill="#0b1440" {KR}>{esc(desc)}</text>
-</g>''')
-    # a quiet cursor walks down the project rows
-    n = len(PROJECTS)
-    cur = ";".join(f"0 {i * 54};0 {i * 54}" for i in range(n)) + ";0 0"
-    ckt = ";".join(f"{i / n + (.03 if i else 0):.3f};{(i + 1) / n - .03:.3f}" for i in range(n))
-    rows.append(f'<rect x="-120" y="372" width="70" height="170" fill="#ffffff" opacity=".22" transform="skewX(-20)">'
-                f'<animate attributeName="x" values="-120;-120;700" keyTimes="0;.8;1" dur="6s" begin="{OPEN + 1}s" repeatCount="indefinite"/></rect>')
-    rows.append(f'<polygon points="22,386 528,380 520,422 16,428" fill="none" stroke="#ffffff" stroke-width="2.5">'
-                f'<animateTransform attributeName="transform" type="translate" dur="{len(PROJECTS) * 1.6}s" repeatCount="indefinite" values="{cur}" keyTimes="0;{ckt};1" calcMode="spline" keySplines="{";".join([".4 0 .2 1"] * (2 * n))}"/></polygon>')
-
-    build = []
-    for i, r in enumerate(repos):
-        y = 396 + i * 38
-        build.append(f'''<g>{slide_in(.5 + i * .08, 500)}
-<polygon points="552,{y} 818,{y - 3} 812,{y + 28} 546,{y + 31}" fill="#ffffff" opacity=".92"/>
-<text x="560" y="{y + 21}" font-size="16" fill="#0b0b0b">{esc(r["name"])}</text>
-<text x="806" y="{y + 20}" text-anchor="end" font-size="11" fill="#1673ef">{esc(r.get("language") or "—")}</text>
-</g>''')
+    menu, help_ = [], []
+    for i, (word, desc) in enumerate(items):
+        x, y = [0, -14, 6, -8, 10, -4, 4][i % 7], i * 36
+        w = len(word) * 40 * .7 + (40 if not word.isascii() else 0)
+        on = ";".join("1" if k == i else "0" for k in range(n))
+        a = i / n
+        kt = f'keyTimes="0;{a:.3f};{a + .02:.3f};{a + .05:.3f};1" {cyc}'
+        tag = f"-14,-30 {w + 26:.0f},-38 {w + 14:.0f},8 {w * .5:.0f},2 -6,6"
+        menu.append(f'<g>{slide_in(.05 + i * .05, 420)}<g transform="translate({x} {y})">'
+                    f'<text x="3" y="3" font-size="40" fill="#0a2a9e" opacity=".5">{esc(word)}</text>'
+                    f'<text font-size="40" fill="{["#bff6ff", "#7fe4ff"][i % 2]}">{esc(word)}</text>'
+                    f'<g opacity="{1 if i == 0 else 0}"><animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>'
+                    f'<polygon points="{tag}" fill="#ff3d9a" transform="translate(7 6)"/>'
+                    f'<g><animateTransform attributeName="transform" type="scale" values="0 1;0 1;1.22 1.22;1.1 1.1;1.1 1.1" {kt}/>'
+                    f'<polygon points="{tag}" fill="#ffffff"/><text font-size="40" fill="#ff1428">{esc(word)}</text></g></g></g></g>')
+        help_.append(f'<text x="930" y="500" text-anchor="end" font-size="14" fill="#ffffff" {KR} opacity="{1 if i == 0 else 0}">'
+                     f'<animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>{esc(desc)}</text>')
 
     caustics = "".join(
-        f'<path d="M{x} {y}q{rx * .4:.0f} {-ry} {rx:.0f} 0t{rx * .8:.0f} {ry * .6:.0f}q{-rx * .9:.0f} {ry * 1.4:.0f} {-rx * 1.8:.0f} 0z" fill="#d8f6ff" opacity="{o}">'
-        f'<animateTransform attributeName="transform" type="translate" values="0 0;{dx} 4;0 0" dur="{d}s" repeatCount="indefinite"/></path>'
-        for x, y, rx, ry, o, dx, d in [(420, 30, 60, 14, .35, 26, 7), (560, 60, 40, 10, .3, -18, 9), (680, 26, 80, 16, .35, 22, 8),
-                                      (780, 70, 34, 8, .3, -14, 6), (470, 96, 30, 7, .25, 16, 10), (620, 300, 44, 9, .2, -20, 11)])
-    windows = "".join(f'<rect x="{x}" y="0" width="3" height="{H}" fill="#0716b0" opacity=".16"/>' for x in range(440, 840, 64))
-    # Underwater layer, after the art director's notes: shimmer and gradation as if underwater,
-    # bubbles, and glass-like sparkle; light rays sway, bubbles rise, the menu drifts like the mind sinking.
+        f'<path d="M{x} {y}q{rx * .4:.0f} {-ry} {rx:.0f} 0t{rx * .8:.0f} {ry * .6:.0f}q{-rx * .9:.0f} {ry * 1.4:.0f} {-rx * 1.8:.0f} 0z" fill="#e6fbff" opacity="{o}">'
+        f'<animateTransform attributeName="transform" type="translate" values="0 0;{dx} 5;0 0" dur="{d}s" repeatCount="indefinite"/></path>'
+        for x, y, rx, ry, o, dx, d in [(380, 24, 70, 14, .45, 26, 7), (520, 58, 46, 10, .35, -18, 9), (660, 22, 90, 16, .45, 22, 8), (820, 64, 60, 12, .35, -14, 6),
+                                      (450, 96, 34, 7, .25, 16, 10), (760, 110, 40, 8, .25, -20, 11), (900, 30, 40, 9, .4, 12, 7.5)])
     rays = "".join(
-        f'<polygon points="{x},0 {x + w},0 {x + w - 90},{H} {x - 150},{H}" fill="#e6fbff" opacity=".07">'
+        f'<polygon points="{x},0 {x + w},0 {x + w - 100},{H} {x - 160},{H}" fill="#e6fbff" opacity=".08">'
         f'<animateTransform attributeName="transform" type="skewX" values="0;{k};0" dur="{d}s" repeatCount="indefinite"/></polygon>'
-        for x, w, k, d in [(470, 40, 4, 9), (600, 70, -3, 11), (730, 30, 5, 8)])
+        for x, w, k, d in [(430, 50, 4, 9), (620, 80, -3, 11), (820, 40, 5, 8)])
     bubbles = "".join(
         f'<circle cx="{x}" cy="{H + 10}" r="{r}" fill="none" stroke="#e6fbff" stroke-width="1.2" opacity="0">'
         f'<animate attributeName="cy" values="{H + 10};-20" dur="{d}s" begin="{b}s" repeatCount="indefinite"/>'
         f'<animate attributeName="cx" values="{x};{x + 10};{x - 6};{x}" dur="{d}s" begin="{b}s" repeatCount="indefinite"/>'
         f'<animate attributeName="opacity" values="0;.7;.7;0" keyTimes="0;.1;.8;1" dur="{d}s" begin="{b}s" repeatCount="indefinite"/></circle>'
-        for x, r, d, b in [(470, 3, 7, 0), (520, 5, 9, 2), (610, 2, 6, 1), (700, 4, 8, 3.5), (780, 3, 7.5, 1.5), (430, 2, 6.5, 4), (560, 2.5, 8.5, 5)])
-    sparkles = "".join(  # four-point glints, like light catching glass
-        f'<path d="M{x} {y - 9}L{x + 2} {y - 2}L{x + 9} {y}L{x + 2} {y + 2}L{x} {y + 9}L{x - 2} {y + 2}L{x - 9} {y}L{x - 2} {y - 2}Z" fill="#ffffff" opacity="0">'
-        f'<animate attributeName="opacity" values="0;1;0;0" keyTimes="0;.1;.25;1" dur="{d}s" begin="{b}s" repeatCount="indefinite"/></path>'
-        for x, y, d, b in [(812, 40, 4, 0), (452, 180, 5, 1.6), (300, 92, 4.5, 2.8), (760, 300, 6, .8)])
-    # A huge numeral for the highlighted menu slot, swapped in step with the selection
-    numeral = "".join(
-        f'<text x="420" y="300" font-size="230" fill="#c9cfd8" opacity="0" font-style="normal">{i + 1}'
-        f'<animate attributeName="opacity" dur="{slot * 5}s" repeatCount="indefinite" calcMode="discrete" values="{";".join(".55" if k == i else "0" for k in range(5))}"/></text>'
-        for i in range(5))
-    streaks = "".join(  # thin directional lines that point the eye toward the menu
-        f'<rect x="{x}" y="{y}" width="{w}" height="2" fill="#ffffff" opacity=".5" transform="rotate(-7 {x} {y})"/>'
-        for x, y, w in [(440, 60, 120), (470, 286, 90), (760, 250, 70)])
+        for x, r, d, b in [(420, 3, 7, 0), (500, 5, 9, 2), (640, 2, 6, 1), (720, 4, 8, 3.5), (880, 3, 7.5, 1.5), (360, 2, 6.5, 4), (590, 2.5, 8.5, 5)])
+    confetti = "".join(  # the small pink/red shards that drift around the menu
+        f'<polygon points="0,0 {w},{w * .3:.0f} {w * .3:.0f},{w * .9:.0f}" fill="{c}">'
+        f'<animateTransform attributeName="transform" type="translate" values="{x} {y};{x + dx} {y - 30};{x} {y}" dur="{d}s" repeatCount="indefinite"/></polygon>'
+        for x, y, w, c, dx, d in [(520, 150, 10, "#ff3d9a", 8, 5), (880, 220, 8, "#ff1428", -6, 6.5), (600, 420, 9, "#ff7ab8", 5, 4.4),
+                                  (930, 380, 7, "#ff3d9a", -8, 7), (470, 300, 6, "#ff1428", 6, 5.6), (760, 470, 8, "#ff7ab8", -7, 6)])
     name = esc((user.get("name") or user["login"]).upper())
     bio = esc((user.get("bio") or "product designer · vibe coder")[:40])
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="{name} — profile menu: projects GOGO, 광탈페, EXPO and recent repositories.">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="{name} — profile menu: projects GOGO, 광탈페, EXPO, recent repositories and portfolio.">
 <defs>
-<linearGradient id="bg" x1="0" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="#55d3ff"/><stop offset=".4" stop-color="#1673ef"/><stop offset="1" stop-color="#0716b0"/></linearGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fd6ff"/><stop offset=".35" stop-color="#1673ef"/><stop offset="1" stop-color="#0716b0"/></linearGradient>
+<radialGradient id="glow" cx=".2" cy=".3" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#e9fbff" stop-opacity=".75"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+<radialGradient id="fade"><stop offset=".55" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></radialGradient>
+<mask id="soft"><circle r="230" fill="url(#fade)"/></mask>
 <clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath>
-<radialGradient id="glow" cx=".28" cy=".22" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".4" stop-color="#e9fbff" stop-opacity=".8"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
-<radialGradient id="fade"><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></radialGradient>
-<mask id="soft"><circle r="150" fill="url(#fade)"/></mask>
 </defs>
 <g clip-path="url(#c)" {FONT}>
 <rect width="{W}" height="{H}" fill="url(#bg)"/>
-{windows}
 {caustics}
 {rays}
-{numeral}
-{streaks}
-<text transform="translate(690 640) rotate(-62)" font-size="170" fill="#ffffff" opacity=".18">LIST</text>
-<text transform="translate(640 330) rotate(-62)" font-size="130" fill="#ffffff" opacity=".18">MENU</text>
-<ellipse cx="170" cy="120" rx="330" ry="250" fill="url(#glow)"/>
-<text transform="translate(58 346) rotate(-90)" font-size="104" fill="#ffffff" opacity=".22">PROFILE</text>
-<g transform="translate(215 190)"><g><animateTransform attributeName="transform" type="translate" values="-6 -10;4 8;-6 -10" dur="10s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
-<g><animateTransform attributeName="transform" type="rotate" values="164;171;164" dur="13s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
-<g mask="url(#soft)"><image href="data:image/png;base64,{hero}" x="-150" y="-150" width="300" height="300"/></g></g></g></g>
-<g transform="rotate(-2 200 50)">
-<rect x="92" y="18" width="220" height="50" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.5"/>
-<text x="102" y="44" font-size="22" fill="#0b0b0b">{name}</text>
-<text x="103" y="60" font-size="9" fill="#0b0b0b" {KR}>{bio}</text>
-</g>
+<ellipse cx="190" cy="240" rx="320" ry="330" fill="url(#glow)"/>
+<g transform="translate(250 280)"><g><animateTransform attributeName="transform" type="translate" values="0 -6;0 8;0 -6" dur="8s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
+<g mask="url(#soft)"><image href="data:image/png;base64,{hero}" x="-230" y="-230" width="460" height="460"/></g></g></g>
+<rect width="62" height="{H}" fill="#ffffff"/>
+<text transform="translate(56 {H + 20}) rotate(-90)" font-size="88" fill="#0b0b0b">PROFILE</text>
+<g transform="rotate(-2 180 40)"><rect x="84" y="16" width="200" height="46" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.5"/>
+<text x="94" y="40" font-size="20" fill="#0b0b0b">{name}</text><text x="95" y="55" font-size="9" fill="#0b0b0b" {KR}>{bio}</text></g>
 {bubbles}
-{sparkles}
-<g transform="translate(486 92) rotate(-7) skewX(-6)">{"".join(menu)}</g>
-<g transform="rotate(-3 120 370)"><text x="30" y="378" font-size="34" fill="#ffffff">LIST</text><text x="122" y="378" font-size="12" fill="#bff6ff">PROJECT</text></g>
-<g transform="rotate(-3 640 370)"><text x="552" y="378" font-size="22" fill="#ffffff">BUILD</text><text x="640" y="378" font-size="11" fill="#bff6ff">recently pushed</text></g>
-{"".join(rows)}
-{"".join(build)}
-<rect x="596" y="566" width="224" height="1.5" fill="#ffffff"/>
-<text x="596" y="578" font-size="9" fill="#ffffff">Guide</text>
-<text x="820" y="592" text-anchor="end" font-size="12" fill="#ffffff">⊗ SELECT  ◎ BACK</text>
+{confetti}
+<g transform="translate(610 120) rotate(-18) skewX(-8)">{"".join(menu)}</g>
+<rect x="640" y="482" width="296" height="1.5" fill="#ffffff"/>
+<text x="640" y="476" font-size="10" fill="#ffffff">Guide</text>
+{"".join(help_)}
+<text x="930" y="524" text-anchor="end" font-size="13" fill="#ffffff">⊗ CONFIRM  ◎ CLOSE</text>
 {splash(W, H)}
 </g>
 </svg>'''
