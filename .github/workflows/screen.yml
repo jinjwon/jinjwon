@@ -1,9 +1,12 @@
 # Regenerates assets/screen.svg from the live GitHub profile (avatar, name, bio, recent repos).
-# GitHub has no "profile changed" event, so it runs daily, on edits to the generator, and on demand.
+# The theme follows Korean time, so it runs at each switch (06:07 P3R, 12:07 P4, 18:07 P5 KST),
+# on edits to the generator, and on demand. GitHub has no "profile changed" event; these runs pick that up too.
 name: profile screen
 on:
   schedule:
-    - cron: "17 0 * * *"
+    - cron: "7 21 * * *"
+    - cron: "7 3 * * *"
+    - cron: "7 9 * * *"
   push:
     branches: [main]
     paths: [assets/screen.gen.py, .github/workflows/screen.yml]
@@ -28,6 +31,8 @@ jobs:
           git diff --quiet assets/screen.svg && exit 0
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/screen.svg
+          # new ?v= so GitHub's image cache fetches the new theme instead of serving the old one
+          sed -i "s/screen.svg?v=[^\"]*/screen.svg?v=$(date +%s)/" README.md
+          git add assets/screen.svg README.md
           git commit -m "Refresh profile screen"
           git push

@@ -1,8 +1,8 @@
 # Builds assets/screen.svg: the whole profile as one pause-menu screen.
 # Pulls the live GitHub profile (avatar, name, bio, latest repos), so a profile change shows up on the next run.
 #   python3 assets/screen.gen.py            (from the repo root; needs Pillow; GITHUB_TOKEN is optional)
-# Run daily and on push by .github/workflows/screen.yml. GitHub READMEs run no scripts, so the motion is SMIL.
-import base64, io, json, os, urllib.request
+# Theme follows Korean time (morning P3R, afternoon P4, night P5); .github/workflows/screen.yml runs it at each switch. GitHub READMEs run no scripts, so the motion is SMIL.
+import base64, datetime, io, json, os, urllib.request
 from PIL import Image, ImageFilter, ImageOps
 
 USER = "jinjwon"
@@ -29,10 +29,33 @@ def esc(s):
     return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
 
-def poster(avatar_bytes):
-    """Avatar -> four flat blues, the way the menu colors its character art."""
+TONES = {"p3r": [(7, 22, 176), (22, 115, 239), (127, 228, 255), (255, 255, 255)],
+         "p4": [(24, 24, 24), (120, 108, 60), (255, 222, 0), (255, 255, 255)],
+         "p5": [(12, 12, 12), (12, 12, 12), (214, 0, 24), (255, 255, 255)]}
+
+
+def theme_now():
+    """Morning P3R, afternoon P4, evening and night P5, by Korean time. THEME=p3r|p4|p5 forces one."""
+    h = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).hour
+    return os.environ.get("THEME") or ("p3r" if 6 <= h < 12 else "p4" if 12 <= h < 18 else "p5")
+
+
+def menu_items(repos):
+    items = [(n, f"{d} · {t}") for n, t, d in PROJECTS]
+    items += [(r["name"].upper(), f"{r.get('language') or 'code'} · recently pushed") for r in repos[:3]]
+    return items + [("PORTFOLIO", "전체 포트폴리오 보기 · framer")]
+
+
+def cycle(i, n, slot=1.6):
+    """Timing shared by every theme: one item highlighted per slot. Returns (on-values, pop keyTimes+dur)."""
+    a, cyc = i / n, f'dur="{slot * n}s" repeatCount="indefinite"'
+    return ";".join("1" if k == i else "0" for k in range(n)), f'keyTimes="0;{a:.3f};{a + .02:.3f};{a + .05:.3f};1" {cyc}', cyc
+
+
+def poster(avatar_bytes, tones):
+    """Avatar -> four flat tones, the way the menus color their character art."""
     g = ImageOps.autocontrast(Image.open(io.BytesIO(avatar_bytes)).convert("L"), cutoff=2).filter(ImageFilter.SMOOTH_MORE)
-    tones, cuts = [(7, 22, 176), (22, 115, 239), (127, 228, 255), (255, 255, 255)], [70, 130, 190]
+    cuts = [70, 130, 190]
     lut = [tones[sum(v > c for c in cuts)] for v in range(256)]
     im = Image.new("RGB", g.size)
     im.putdata([lut[v] for v in g.getdata()])
@@ -68,7 +91,7 @@ def splash(W, H):
     return "\n".join(out)
 
 
-def screen(user, repos, hero):
+def screen_p3r(user, repos, hero):
     """Layout read off P3R pause-menu frames: full-bleed water, character bleeding off the left, a tilted
     stack of words center-right (selected = red on a white jagged tag), wallet box top-left, help line bottom-right."""
     W, H = 960, 540
@@ -150,11 +173,142 @@ def screen(user, repos, hero):
 </svg>'''
 
 
+def tv_on(W, H):
+    """P4 opening: a TV switching on, a white line opening to full picture."""
+    return (f'<rect width="{W}" height="{H}" fill="#111"><animate attributeName="opacity" values="1;1;0" keyTimes="0;.6;1" dur="{OPEN}s" fill="freeze"/></rect>'
+            f'<rect x="0" y="{H / 2 - 2}" width="{W}" height="4" fill="#ffffff" opacity="0">'
+            f'<animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.2;.6;1" dur="{OPEN}s" fill="freeze"/>'
+            f'<animate attributeName="height" values="4;4;{H};{H}" keyTimes="0;.4;.75;1" dur="{OPEN}s" fill="freeze"/>'
+            f'<animate attributeName="y" values="{H / 2 - 2};{H / 2 - 2};0;0" keyTimes="0;.4;.75;1" dur="{OPEN}s" fill="freeze"/></rect>')
+
+
+def p5_wipe(W, H):
+    """P5 opening: black shards slash away off a red flash."""
+    out = [f'<rect width="{W}" height="{H}" fill="#ff1a2e"><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;.35;.7;1" dur="{OPEN}s" fill="freeze"/></rect>']
+    for k, (pts, dx) in enumerate([("0,0 620,0 360,560 0,560", -900), ("540,-20 980,-20 980,300 300,560", 900), ("200,300 980,240 980,560 120,560", 1100)]):
+        out.append(f'<polygon points="{pts}" fill="#0b0b0b"><animateTransform attributeName="transform" type="translate" values="0 0;0 0;{dx} {-dx * .25:.0f}" '
+                   f'keyTimes="0;{.3 + k * .08:.2f};1" dur="{OPEN}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.6 0 .9 .5"/></polygon>')
+    return "".join(out)
+
+
+def screen_p4(user, repos, hero):
+    """After P4 Revival menu frames: hot yellow, white daisies, a duotone character, black words on white tags, TV scanlines."""
+    W, H = 960, 540
+    items = menu_items(repos); n = len(items)
+    menu, help_ = [], []
+    for i, (word, desc) in enumerate(items):
+        on, kt, cyc = cycle(i, n)
+        x, y = [0, 18, 6, 24, 10, 28, 14][i % 7], i * 40
+        w = len(word) * 34 * .68 + (34 if not word.isascii() else 0)
+        tag = f"-10,-30 {w + 18:.0f},-34 {w + 10:.0f},8 -16,10"
+        menu.append(f'<g>{slide_in(.05 + i * .05, 420)}<g transform="translate({x} {y})">'
+                    f'<polygon points="{tag}" fill="#ffffff"/><text font-size="34" fill="#141414">{esc(word)}</text>'
+                    f'<g opacity="{1 if i == 0 else 0}"><animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>'
+                    f'<g><animateTransform attributeName="transform" type="scale" values="1 0;1 0;1.08 1.25;1.05 1.05;1.05 1.05" {kt}/>'
+                    f'<polygon points="{tag}" fill="#141414"/><text font-size="34" fill="#ffde00">{esc(word)}</text></g></g></g></g>')
+        help_.append(f'<text x="926" y="503" text-anchor="end" font-size="14" fill="#141414" {KR} opacity="{1 if i == 0 else 0}">'
+                     f'<animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>{esc(desc)}</text>')
+    def daisy(x, y, r, d, b):
+        petals = "".join(f'<ellipse cx="0" cy="{-r}" rx="{r * .42:.1f}" ry="{r * .7:.1f}" fill="#ffffff" transform="rotate({a})"/>' for a in range(0, 360, 60))
+        return (f'<g transform="translate({x} {y})"><g><animateTransform attributeName="transform" type="rotate" values="0;360" dur="{d}s" begin="{b}s" repeatCount="indefinite"/>'
+                f'{petals}<circle r="{r * .45:.1f}" fill="#ffb300"/></g></g>')
+    flowers = "".join(daisy(*f) for f in [(470, 70, 16, 14, 0), (900, 90, 22, 18, 2), (520, 470, 14, 12, 1), (880, 300, 12, 10, 3), (420, 250, 10, 16, 0), (700, 40, 11, 13, 1)])
+    stripes = "".join(f'<polygon points="0,0 1400,{-60 + k * 0} 1400,60" fill="#ffe94d" transform="rotate({k * 30})"/>' for k in range(12))
+    scan = "".join(f'<rect y="{y}" width="{W}" height="1" fill="#000" opacity=".06"/>' for y in range(0, H, 4))
+    name = esc((user.get("name") or user["login"]).upper()); bio = esc((user.get("bio") or "product designer · vibe coder")[:40])
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="{name} — profile menu: projects GOGO, 광탈페, EXPO, recent repositories and portfolio.">
+<defs><radialGradient id="fade"><stop offset=".55" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></radialGradient>
+<mask id="soft"><circle r="230" fill="url(#fade)"/></mask><clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath></defs>
+<g clip-path="url(#c)" {FONT}>
+<rect width="{W}" height="{H}" fill="#ffd400"/>
+<g transform="translate(260 290)"><g><animateTransform attributeName="transform" type="rotate" values="0;360" dur="90s" repeatCount="indefinite"/>{stripes}</g></g>
+<text transform="translate(560 520) rotate(-8)" font-size="200" fill="#f2b800" opacity=".55">MENU</text>
+<g transform="translate(260 290)"><g><animateTransform attributeName="transform" type="translate" values="0 -6;0 8;0 -6" dur="8s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
+<g mask="url(#soft)"><image href="data:image/png;base64,{hero}" x="-230" y="-230" width="460" height="460"/></g></g></g>
+<polygon points="560,0 960,0 960,540 470,540" fill="#ffffff" opacity=".35"/>
+{flowers}
+<rect width="62" height="{H}" fill="#141414"/>
+<text transform="translate(56 {H + 20}) rotate(-90)" font-size="88" fill="#ffde00">PROFILE</text>
+<g transform="rotate(-2 180 40)"><rect x="84" y="16" width="200" height="46" fill="#141414"/>
+<text x="94" y="40" font-size="20" fill="#ffffff">{name}</text><text x="95" y="55" font-size="9" fill="#ffde00" {KR}>{bio}</text></g>
+<g transform="translate(600 118) rotate(-8) skewX(-8)">{"".join(menu)}</g>
+<rect x="630" y="484" width="306" height="28" fill="#ffffff" transform="skewX(-12)"/>
+{"".join(help_)}
+<text x="926" y="528" text-anchor="end" font-size="12" fill="#141414">⊗ CONFIRM  ◎ CLOSE</text>
+{scan}
+{tv_on(W, H)}
+</g>
+</svg>"""
+
+
+def screen_p5(user, repos, hero):
+    """After P5 pause-menu frames: red and black, halftone, a jagged white burst, ransom-note words, COMMAND."""
+    W, H = 960, 540
+    items = menu_items(repos); n = len(items)
+    menu, help_ = [], []
+    for i, (word, desc) in enumerate(items):
+        on, kt, cyc = cycle(i, n)
+        x, y = [0, -16, 8, -6, 12, -10, 4][i % 7], i * 38
+        letters, cx = [], 0
+        for j, ch in enumerate(word):
+            fs = 30 + (j * 7 + i * 3) % 3 * 4
+            cw = fs * (.66 if ch.isascii() else 1.0)
+            rot = ((j * 37 + i * 11) % 11) - 5
+            style = (j + i) % 3
+            if style == 1:  # white letter on a black chip, upright so it stays inside the chip
+                cw *= 1.25
+                body = (f'<rect x="-2" y="{-fs * .84:.0f}" width="{cw + 2:.0f}" height="{fs:.0f}" fill="#0b0b0b"/>'
+                        f'<text x="{cw / 2:.0f}" text-anchor="middle" font-size="{fs}" fill="#ffffff" font-style="normal">{esc(ch)}</text>')
+            else:
+                body = f'<text font-size="{fs}" fill="#0b0b0b">{esc(ch)}</text>'
+            letters.append(f'<g transform="translate({cx:.0f} 0) rotate({rot})">{body}</g>')
+            cx += cw + 2
+        tag = f"-14,-34 {cx + 20:.0f},-40 {cx + 8:.0f},10 -8,6"
+        menu.append(f'<g>{slide_in(.05 + i * .05, 420)}<g transform="translate({x} {y})">{"".join(letters)}'
+                    f'<g opacity="{1 if i == 0 else 0}"><animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>'
+                    f'<g><animateTransform attributeName="transform" type="scale" values="0 1;0 1;1.18 1.18;1.08 1.08;1.08 1.08" {kt}/>'
+                    f'<polygon points="{tag}" fill="#0b0b0b"/><text font-size="36" fill="#ff1a2e">{esc(word)}</text></g></g></g></g>')
+        help_.append(f'<text x="926" y="506" text-anchor="end" font-size="14" fill="#ffffff" {KR} opacity="{1 if i == 0 else 0}">'
+                     f'<animate attributeName="opacity" calcMode="discrete" values="{on}" {cyc}/>{esc(desc)}</text>')
+    shards = "".join(f'<polygon points="{p}" fill="#0b0b0b"/>' for p in ["380,0 520,0 300,540 220,540", "880,0 960,0 960,140", "0,440 260,540 0,540"])
+    stars = "".join(f'<path d="M0 -{r}L{r * .3:.0f} -{r * .3:.0f}L{r} 0L{r * .3:.0f} {r * .3:.0f}L0 {r}L-{r * .3:.0f} {r * .3:.0f}L-{r} 0L-{r * .3:.0f} -{r * .3:.0f}Z" fill="#0b0b0b" transform="translate({x} {y})">'
+                    f'<animateTransform attributeName="transform" type="rotate" values="0 {x} {y};90 {x} {y}" dur="{d}s" repeatCount="indefinite" additive="sum"/></path>'
+                    for x, y, r, d in [(470, 60, 18, 6), (920, 230, 14, 5), (520, 470, 12, 7), (860, 40, 10, 4)])
+    name = esc((user.get("name") or user["login"]).upper()); bio = esc((user.get("bio") or "product designer · vibe coder")[:40])
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="{name} — profile menu: projects GOGO, 광탈페, EXPO, recent repositories and portfolio.">
+<defs><pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="5" cy="5" r="2.2" fill="#0b0b0b"/></pattern>
+<radialGradient id="fade"><stop offset=".55" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></radialGradient>
+<mask id="soft"><circle r="230" fill="url(#fade)"/></mask><clipPath id="c"><rect width="{W}" height="{H}" rx="10"/></clipPath></defs>
+<g clip-path="url(#c)" {FONT}>
+<rect width="{W}" height="{H}" fill="#d90012"/>
+<rect width="{W}" height="{H}" fill="url(#dots)" opacity=".18"/>
+{shards}
+<g transform="translate(250 290)"><g><animateTransform attributeName="transform" type="translate" values="0 -6;0 8;0 -6" dur="8s" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" repeatCount="indefinite"/>
+<g mask="url(#soft)"><image href="data:image/png;base64,{hero}" x="-230" y="-230" width="460" height="460"/></g></g></g>
+<g><animateTransform attributeName="transform" type="translate" values="0 0;3 -2;0 0" dur="2.4s" repeatCount="indefinite"/>
+<polygon points="520,60 620,24 690,80 800,18 840,90 950,70 905,170 958,250 890,300 940,400 820,392 790,440 700,400 610,440 580,392 470,410 520,320 440,270 520,210 450,130" fill="#0b0b0b" transform="translate(10 10)"/>
+<polygon points="520,60 620,24 690,80 800,18 840,90 950,70 905,170 958,250 890,300 940,400 820,392 790,440 700,400 610,440 580,392 470,410 520,320 440,270 520,210 450,130" fill="#ffffff"/></g>
+{stars}
+<rect width="62" height="{H}" fill="#0b0b0b"/>
+<text transform="translate(56 {H + 20}) rotate(-90)" font-size="88" fill="#ff1a2e">PROFILE</text>
+<g transform="rotate(-3 180 40)"><rect x="90" y="22" width="200" height="46" fill="#ff1a2e"/><rect x="84" y="16" width="200" height="46" fill="#ffffff" stroke="#0b0b0b" stroke-width="2"/>
+<text x="94" y="40" font-size="20" fill="#0b0b0b">{name}</text><text x="95" y="55" font-size="9" fill="#0b0b0b" {KR}>{bio}</text></g>
+<g transform="translate(560 112) rotate(-10) scale(.92)">{"".join(menu)}</g>
+<text transform="translate(560 476) rotate(-6)" font-size="50" fill="#0b0b0b" stroke="#ffffff" stroke-width="2">COMMAND</text>
+{"".join(help_)}
+<text x="926" y="528" text-anchor="end" font-size="12" fill="#ffffff">⊗ CONFIRM  ◎ CLOSE</text>
+{p5_wipe(W, H)}
+</g>
+</svg>"""
+
+
 if __name__ == "__main__":
     user = get(f"https://api.github.com/users/{USER}")
     repos = [r for r in get(f"https://api.github.com/users/{USER}/repos?sort=pushed&per_page=30")
              if not r["fork"] and not r["private"] and r["name"] != USER][:4]
-    svg = screen(user, repos, poster(get(user["avatar_url"] + "&s=300" if "?" in user["avatar_url"] else user["avatar_url"] + "?s=300", raw=True)))
+    theme = theme_now()
+    avatar = get(user["avatar_url"] + ("&" if "?" in user["avatar_url"] else "?") + "s=300", raw=True)
+    svg = {"p3r": screen_p3r, "p4": screen_p4, "p5": screen_p5}[theme](user, repos, poster(avatar, TONES[theme]))
     assert svg.count("<svg") == 1 and len(repos) <= 4
     open(os.path.join(HERE, "screen.svg"), "w").write(svg)
-    print("screen.svg", len(svg) // 1024, "KB,", len(repos), "repos")
+    print("screen.svg", theme, len(svg) // 1024, "KB,", len(repos), "repos")
