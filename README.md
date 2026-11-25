@@ -1,4 +1,4 @@
-<img src="assets/screen.svg?v=12" width="100%" alt="Jinwon Kim — profile menu (P3R in the morning, P4 in the afternoon, P5 at night). Projects: GOGO, 광탈페, EXPO. Recently pushed repositories." />
+<img src="assets/screen.svg?v=1795582074" width="100%" alt="Jinwon Kim — profile menu (P3R in the morning, P4 in the afternoon, P5 at night). Projects: GOGO, 광탈페, EXPO. Recently pushed repositories." />
 
 <p align="center">
 <a href="https://free-surface-343720.framer.app/gogo">GOGO</a> ·
